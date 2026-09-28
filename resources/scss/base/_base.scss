@@ -22,7 +22,7 @@ button { color: inherit; }
   margin: 0 auto;
   padding: clamp(27px, 4vh, 46px) 0 0;
 }
-.brand { display: block; width: clamp(224px, 25vw, 300px); margin: 0 auto; transition: opacity .24s ease, transform .24s ease; }
+.brand { display: block; width: clamp(260px, 29vw, 360px); margin: 0 auto; transition: opacity .24s ease, transform .24s ease; }
 .brand img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
 .site-nav {
   width: max-content;
@@ -65,17 +65,17 @@ button { color: inherit; }
 @media (max-width: 900px) {
   .site-header, .page-shell { width: min(calc(100% - 52px), 1160px); }
   .site-header { padding-top: 30px; }
-  .brand { width: 255px; }
+  .brand { width: 290px; }
 }
 @media (max-width: 600px) {
   .site-header, .page-shell { width: min(calc(100% - 32px), 1160px); }
   .site-header { padding-top: max(21px, env(safe-area-inset-top)); }
-  .brand { width: clamp(190px, 58vw, 230px); }
+  .brand { width: clamp(220px, 64vw, 270px); }
   .site-nav { margin-top: 19px; }
   .nav-link { min-height: 38px; min-width: 86px; }
 }
 @media (orientation: landscape) and (max-height: 650px) {
   .site-header { padding-top: 16px; }
-  .brand { width: 208px; }
+  .brand { width: 235px; }
   .site-nav { margin-top: 11px; }
 }

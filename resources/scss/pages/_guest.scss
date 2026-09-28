@@ -1,5 +1,5 @@
 .guest-page .site-header { padding-top: clamp(22px, 5vh, 42px); }
-.guest-page .brand { width: clamp(200px, 55vw, 255px); }
+.guest-page .brand { width: clamp(230px, 62vw, 290px); }
 .guest-page .page-shell { width: min(calc(100% - 36px), 450px); }
 .guest-content { padding: clamp(20px, 4vh, 36px) 0 36px; }
 .guest-card { padding: 10px; border: 1px solid rgba(245, 252, 246, .24); border-radius: 18px; background: linear-gradient(145deg, rgba(226, 244, 229, .15), rgba(223, 246, 228, .06)); box-shadow: 0 24px 64px rgba(0, 18, 20, .25), inset 0 1px 0 rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px); }
