@@ -1,0 +1,13 @@
+.live-status { display: inline-flex; align-items: center; gap: 6px; min-height: 25px; padding: 4px 9px; border-radius: 999px; background: #d4eee7; color: #105943; font-size: .63rem; font-weight: 700; letter-spacing: .02em; }
+.live-status__dot { width: 6px; height: 6px; border-radius: 50%; background: #23ad71; }
+.live-status[data-status='reconnecting'] { background: #f7e8bf; color: #7c5d13; }
+.live-status[data-status='reconnecting'] .live-status__dot { background: #d09d1f; }
+.live-status[data-status='error'] { background: #ffe5e1; color: #9b3d36; }
+.live-status[data-status='error'] .live-status__dot { background: #e0564a; }
+.state-card { min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 25px; border-radius: 6px; background: #fff; color: #222; text-align: center; }
+.state-card p { color: #59615f; font-size: .8rem; }
+.state-card__icon { color: #297569; }
+.skeleton-card { min-height: 285px; border-radius: 6px; background: #e6eae9; animation: pulse 1.3s ease-in-out infinite alternate; }
+.skeleton-card span:first-child { display: block; height: 230px; margin: 5px; background: #d3d9d7; }
+.skeleton-card span:last-child { display: block; width: 60%; height: 12px; margin: 10px; background: #d3d9d7; }
+@keyframes pulse { to { opacity: .5; } }
