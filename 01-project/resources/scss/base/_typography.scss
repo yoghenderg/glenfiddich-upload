@@ -1,0 +1,10 @@
+@use '../abstracts/tokens' as t;
+h1, h2, h3 { font-family: 'Montserrat', Arial, sans-serif; letter-spacing: -.035em; }
+h1 { font-size: 1.8rem; font-weight: 700; line-height: 1.18; }
+h2 { font-size: 1.25rem; font-weight: 600; line-height: 1.25; }
+h3 { font-size: 1rem; font-weight: 600; }
+h1 em, h2 em { font-style: normal; }
+p { line-height: 1.5; }
+.eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.eyebrow__line { display: none; }
+.muted { color: #69706e; }
