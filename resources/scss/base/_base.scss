@@ -6,11 +6,7 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
-  background:
-    radial-gradient(ellipse 68% 52% at 50% -17%, rgba(110, 159, 139, .29), transparent 74%),
-    radial-gradient(ellipse 40% 45% at -10% 72%, rgba(33, 109, 104, .23), transparent 75%),
-    radial-gradient(ellipse 42% 50% at 110% 87%, rgba(119, 142, 100, .11), transparent 76%),
-    linear-gradient(155deg, #073a3d 0%, t.$forest 46%, t.$forest-deep 100%);
+  background: t.$forest;
   color: t.$ink;
   font-family: 'Montserrat', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
