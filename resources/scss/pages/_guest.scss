@@ -1,9 +1,9 @@
 .guest-page .site-header { padding-top: clamp(22px, 5vh, 42px); }
 .guest-page .brand { width: clamp(200px, 55vw, 255px); }
-.guest-page .page-shell { width: min(100% - 36px, 430px); }
+.guest-page .page-shell { width: min(calc(100% - 36px), 450px); }
 .guest-content { padding: clamp(20px, 4vh, 36px) 0 36px; }
-.guest-card { padding: 10px; border: 1px solid #e6eae5; border-radius: 9px; background: #fbfcf9; box-shadow: 0 18px 52px rgba(0,18,20,.19); }
-.guest-card__media { display: grid; place-items: center; min-height: 0; overflow: hidden; border-radius: 4px; background: #0b5553; }
+.guest-card { padding: 10px; border: 1px solid rgba(245, 252, 246, .24); border-radius: 18px; background: linear-gradient(145deg, rgba(226, 244, 229, .15), rgba(223, 246, 228, .06)); box-shadow: 0 24px 64px rgba(0, 18, 20, .25), inset 0 1px 0 rgba(255, 255, 255, .14); -webkit-backdrop-filter: blur(22px); backdrop-filter: blur(22px); }
+.guest-card__media { display: grid; place-items: center; min-height: 0; overflow: hidden; border-radius: 11px; background: #0b5553; }
 .guest-card__media .media-display { display: block; width: 100%; max-height: min(62svh, 590px); object-fit: contain; }
-.guest-download { width: 100%; min-height: 46px; margin-top: 10px; border-radius: 6px; font-size: .72rem; }
-@media (max-width: 380px) { .guest-page .page-shell { width: min(100% - 28px, 430px); } .guest-card { padding: 8px; } .guest-card__media .media-display { max-height: 58svh; } }
+.guest-download { width: 100%; min-height: 47px; margin-top: 11px; font-size: .72rem; }
+@media (max-width: 380px) { .guest-page .page-shell { width: min(calc(100% - 28px), 430px); } .guest-card { padding: 8px; } .guest-card__media .media-display { max-height: 58svh; } }

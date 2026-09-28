@@ -6,7 +6,7 @@
     <a class="nav-link is-active" href="{{ route('gallery') }}" aria-current="page">Gallery</a>
 @endsection
 @section('content')
-<section class="gallery-content" data-gallery data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">
+<section class="gallery-content" data-gallery data-count="{{ count($items) }}" data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">
     <div class="gallery-heading">
         <div class="gallery-heading__title"><h1 id="gallery-title">Media Gallery</h1><div id="live-status" class="live-status" data-status="{{ $state === 'ready' ? 'live' : $state }}" role="status" aria-live="polite"><span class="live-status__dot"></span><span id="live-label">{{ $state === 'ready' ? 'LIVE' : strtoupper($state) }}</span></div></div>
         <form class="gallery-sort" action="{{ route('gallery') }}" method="get"><label for="gallery-sort">Sort by</label><span class="gallery-sort__field"><select id="gallery-sort" name="sort"><option value="none" @selected($sort === 'none')>None</option><option value="today" @selected($sort === 'today')>Today</option><option value="yesterday" @selected($sort === 'yesterday')>Yesterday</option></select></span><button class="visually-hidden" type="submit">Apply sort</button></form>
@@ -18,7 +18,7 @@
     @elseif(count($items) === 0)
         <div class="state-card"><span class="state-card__icon"><x-icon name="image" :size="28"/></span><h2>No media yet</h2><p>Photos and videos will appear here.</p><a class="button button--dark" href="{{ route('upload') }}">Go to upload</a></div>
     @else
-        <div class="media-grid" id="media-grid">@foreach($items as $item)<x-media-card :item="$item"/>@endforeach</div>
+        <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item"/>@endforeach</div>
     @endif
     <div class="pagination-bar"><span><span id="media-count">{{ count($items) }}</span> {{ count($items) === 1 ? 'item' : 'items' }} · Page 1 of 1</span><span class="pagination-bar__page" aria-current="page">1</span></div>
 </section>
@@ -30,7 +30,7 @@
         <aside class="viewer__sidebar">
             <h2 id="viewer-title" class="viewer__timestamp"><span id="viewer-date"></span><time id="viewer-time"></time></h2>
             <div class="viewer__qr-area"><p class="viewer__qr-label">SCAN TO DOWNLOAD</p><div class="qr-frame"><canvas id="viewer-qr" width="160" height="160" aria-label="QR code for this moment"></canvas></div></div>
-            <div class="viewer__actions"><a id="viewer-download" class="button button--dark" download><x-icon name="download" :size="17"/> Download</a><button type="button" id="viewer-share" class="button button--soft"><x-icon name="share" :size="17"/> Share / AirDrop</button></div>
+            <div class="viewer__actions"><a id="viewer-download" class="button button--dark" download><x-icon name="download" :size="17"/> Download</a><button type="button" id="viewer-share" class="button button--soft"><x-icon name="airdrop" :size="19"/> Share / AirDrop</button></div>
             <p class="viewer__hint" id="viewer-hint" role="status" aria-live="polite"></p>
         </aside>
     </section>
