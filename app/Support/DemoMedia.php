@@ -13,11 +13,22 @@ final class DemoMedia
         $second = $today->copy()->setTime(11, 20);
         $third = $yesterday->copy()->setTime(19, 10);
 
-        return [
+        $samples = [
             ['id' => 'moment-001', 'title' => 'An evening at the paddock', 'filename' => 'IMG_1942.jpg', 'type' => 'image', 'src' => asset('media/paddock.jpg'), 'poster' => asset('media/paddock.jpg'), 'alt' => 'Guest overlooking a motorsport hospitality venue at dusk', 'date' => $first->toDateString(), 'date_display' => $first->format('d-m-Y'), 'captured_at' => $first->toIso8601String(), 'time_display' => $first->format('h:i A')],
             ['id' => 'moment-002', 'title' => 'The celebration', 'filename' => 'IMG_1946.jpg', 'type' => 'image', 'src' => asset('media/hospitality.jpg'), 'poster' => asset('media/hospitality.jpg'), 'alt' => 'Two guests enjoying a celebration beside a classic green car', 'date' => $second->toDateString(), 'date_display' => $second->format('d-m-Y'), 'captured_at' => $second->toIso8601String(), 'time_display' => $second->format('h:i A')],
             ['id' => 'moment-003', 'title' => 'Paddock film', 'filename' => 'VID_1951.mp4', 'type' => 'video', 'src' => asset('media/paddock-preview.mp4'), 'poster' => asset('media/arrival.jpg'), 'alt' => 'Short sample video beside a green racing car', 'date' => $third->toDateString(), 'date_display' => $third->format('d-m-Y'), 'captured_at' => $third->toIso8601String(), 'time_display' => $third->format('h:i A')],
         ];
+
+        // Reuse the three sample assets to make pagination reviewable without
+        // introducing real guest media. Replace this fixture with event records.
+        $items = [];
+        for ($index = 0; $index < 32; $index++) {
+            $item = $samples[$index % count($samples)];
+            $item['id'] = sprintf('moment-%03d', $index + 1);
+            $items[] = $item;
+        }
+
+        return $items;
     }
 
     public static function sorted(string $sort): array

@@ -3,6 +3,7 @@ import '@fontsource/montserrat/latin-500.css';
 import '@fontsource/montserrat/latin-600.css';
 import '@fontsource/montserrat/latin-700.css';
 import QRCode from 'qrcode';
+import { initPagination } from './gallery-pagination';
 import { ChunkedUpload } from './uploads/chunked-upload';
 import { demoTransport, httpTransport } from './uploads/transports';
 import { prepareShareFile, shareMoment } from './share';
@@ -110,6 +111,7 @@ function initUpload() {
 function initGallery() {
     const gallery = $('[data-gallery]');
     if (!gallery) return;
+    initPagination(gallery);
     const viewer = $('#media-viewer'), mediaHost = $('#viewer-media'), feedback = $('#viewer-hint');
     const media = window.demoMedia || [];
     let previousFocus = null, current = null, currentUrl = '', shareFile = null, shareController = null;
