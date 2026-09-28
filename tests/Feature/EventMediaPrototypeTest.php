@@ -33,7 +33,7 @@ class EventMediaPrototypeTest extends TestCase
     public function test_upload_gallery_and_guest_pages_render(): void
     {
         $this->asEventStaff()->get('/upload')->assertOk()->assertSee('Share your photo');
-        $this->asEventStaff()->get('/gallery')->assertOk()->assertSee('Media Gallery')->assertSee(today()->format('d-m-Y'))->assertSee('02:35 PM')->assertDontSee('Open on phone');
+        $this->asEventStaff()->get('/gallery')->assertOk()->assertSee('Media Gallery')->assertSee(today()->format('d-m-Y'))->assertSee('02:35 PM')->assertSee('rel="preload"', false)->assertSee('fetchpriority="high"', false)->assertDontSee('Open on phone');
         $this->get('/media/moment-001')->assertOk()->assertSee('Download photo')->assertDontSee('Share / AirDrop');
         $this->get('/media/moment-032')->assertOk()->assertSee('Download photo');
         $this->get('/media/moment-003')->assertOk()->assertSee('<video', false);

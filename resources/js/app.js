@@ -2,13 +2,19 @@ import '@fontsource/montserrat/latin-400.css';
 import '@fontsource/montserrat/latin-500.css';
 import '@fontsource/montserrat/latin-600.css';
 import '@fontsource/montserrat/latin-700.css';
-import QRCode from 'qrcode';
 import { initPagination } from './gallery-pagination';
 import { ChunkedUpload } from './uploads/chunked-upload';
 import { demoTransport, httpTransport } from './uploads/transports';
 import { prepareShareFile, shareMoment } from './share';
 
 const $ = (selector, root = document) => root.querySelector(selector);
+let qrCodeModule;
+
+async function drawQr(canvas, value) {
+    qrCodeModule ||= import('qrcode');
+    const { default: QRCode } = await qrCodeModule;
+    await QRCode.toCanvas(canvas, value, { width: 160, margin: 1, color: { dark: '#111111', light: '#ffffff' } });
+}
 
 function initUpload() {
     const form = $('#upload-form');
@@ -135,7 +141,7 @@ function initGallery() {
         currentUrl = `${gallery.dataset.guestBase}/${encodeURIComponent(item.id)}`;
         const download = $('#viewer-download'); download.href = item.src; download.download = item.filename;
         feedback.textContent = '';
-        try { await QRCode.toCanvas($('#viewer-qr'), currentUrl, { width: 160, margin: 1, color: { dark: '#111111', light: '#ffffff' } }); }
+        try { await drawQr($('#viewer-qr'), currentUrl); }
         catch { feedback.textContent = 'QR code unavailable. Use Share instead.'; }
         viewer.hidden = false;
         document.body.classList.add('viewer-open');

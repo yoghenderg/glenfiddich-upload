@@ -5,6 +5,9 @@
     <a class="nav-link" href="{{ route('upload') }}">Upload</a>
     <a class="nav-link is-active" href="{{ route('gallery') }}" aria-current="page">Gallery</a>
 @endsection
+@push('head')
+    @if($state === 'ready' && count($items) > 0)<link rel="preload" as="image" href="{{ asset($items[0]['poster']) }}" fetchpriority="high">@endif
+@endpush
 @section('content')
 <section class="gallery-content" data-gallery data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">
     <div class="gallery-heading">
@@ -18,7 +21,7 @@
     @elseif(count($items) === 0)
         <div class="state-card"><span class="state-card__icon"><x-icon name="image" :size="28"/></span><h2>No media yet</h2><p>Photos and videos will appear here.</p><a class="button button--dark" href="{{ route('upload') }}">Go to upload</a></div>
     @else
-        <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item" :hidden="$loop->index >= 16"/>@endforeach</div>
+        <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item" :hidden="$loop->index >= 16" :priority="$loop->index < 4"/>@endforeach</div>
     @endif
     @if($state === 'ready' && count($items) > 0)
     <nav class="pagination-bar" aria-label="Gallery pages">

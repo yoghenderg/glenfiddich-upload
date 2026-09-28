@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#033037">
     <meta name="description" content="Aston Martin Formula One Team x Glenfiddich event moments">
     <title>@yield('title', 'Event moments') · Aston Martin F1 x Glenfiddich</title>
+    @stack('head')
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
 <body class="aston-page @yield('body-class')">

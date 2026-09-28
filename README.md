@@ -41,6 +41,10 @@ Commit the Laravel project files at the repository root so Carlo sees `app`, `re
 
 The demo photographs are generated fictional samples; the short sample MP4 is a still-image clip. They are not real event uploads.
 
+## Gallery performance
+
+The first visible gallery poster is preloaded and marked high priority; the first four cards load eagerly, while later cards remain lazy. Every card declares its intrinsic dimensions to reserve its layout before the image arrives. The QR encoder is split into a separate JavaScript chunk and only downloads when staff open the detail viewer. `public/.htaccess` supplies cache headers when the Laravel `public` directory is served by Apache: immutable Vite assets and fonts cache for one year, and media cache for seven days. Carlo should reproduce the equivalent headers in Nginx, Caddy, a load balancer, or CDN if Apache is not the production web server. HTTP/2 or HTTP/3 and image re-encoding are server/deployment work, not settings Laravel can enforce from this frontend.
+
 ## Structure and Carlo's integration points
 
 | Area | Current source | Replace with |
