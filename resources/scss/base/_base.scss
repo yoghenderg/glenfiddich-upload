@@ -23,7 +23,7 @@ button { color: inherit; }
   padding: clamp(27px, 4vh, 46px) 0 0;
 }
 .brand { display: block; width: clamp(224px, 25vw, 300px); margin: 0 auto; transition: opacity .24s ease, transform .24s ease; }
-.brand img { width: 100%; height: auto; }
+.brand img { display: block; width: 100%; max-width: 100%; height: auto; object-fit: contain; }
 .site-nav {
   width: max-content;
   max-width: 100%;
