@@ -17,6 +17,17 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 Open `/upload`, `/gallery`, and `/media/moment-001`. Use the host machine's LAN IP rather than `localhost` when scanning a QR from a phone; both devices must reach the same server. Set `APP_URL` to that reachable origin in `.env` when deploying to the event network. Serve over HTTPS for native file sharing where required by the browser.
 
+## Staff access
+
+`/upload`, `/gallery`, and `/gallery/feed` require a staff session. `/media/{id}` stays public because it is the QR guest destination. Set these values in the deployment `.env`; they are deliberately blank in the repository and must not be committed with real credentials:
+
+```dotenv
+EVENT_STAFF_EMAIL=staff@example.com
+EVENT_STAFF_PASSWORD=use-a-long-unique-password
+```
+
+The prototype uses Laravel's encrypted session and rotates the session ID on a successful sign-in. It also limits failed login attempts. Carlo can replace this small environment-backed gate with database users, SSO, or the event's preferred Laravel auth provider later without changing the protected route grouping in `routes/web.php`.
+
 ## GitHub handoff
 
 Commit the Laravel project files at the repository root so Carlo sees `app`, `resources`, `routes`, `composer.json`, `package.json` and this README directly. Do not commit `.env`, `vendor`, `node_modules`, generated `public/build`, temporary storage files, the ZIP handoff archive or screenshot previews. The included `.gitignore` covers the usual local artifacts when using Git or GitHub Desktop. After cloning, run the setup commands above to install dependencies and build assets. A GitHub repository stores the code; it does not run the Laravel site by itself.
