@@ -6,7 +6,7 @@
     <a class="nav-link is-active" href="{{ route('gallery') }}" aria-current="page">Gallery</a>
 @endsection
 @push('head')
-    @if($state === 'ready' && count($items) > 0)<link rel="preload" as="image" href="{{ asset($items[0]['poster']) }}" fetchpriority="high">@endif
+    @if($state === 'ready' && count($items) > 0 && $items[0]['poster'])<link rel="preload" as="image" href="{{ asset($items[0]['poster']) }}" fetchpriority="high">@endif
 @endpush
 @section('content')
 <section class="gallery-content" data-gallery data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">

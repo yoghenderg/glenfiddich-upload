@@ -5,7 +5,7 @@
 <section class="guest-content" aria-label="Your event media">
     <div class="guest-card">
         <div class="guest-card__media">@include('partials.media-display')</div>
-        <a class="button button--dark guest-download" href="{{ $item['src'] }}" download="{{ $item['filename'] }}"><x-icon name="download" :size="18"/> Download {{ $item['type'] === 'video' ? 'video' : 'photo' }}</a>
+        <a class="button button--dark guest-download" href="{{ $item['download'] }}" download="{{ $item['filename'] }}"><x-icon name="download" :size="18"/> Download {{ $item['type'] === 'video' ? 'video' : 'photo' }}</a>
     </div>
 </section>
 @endsection

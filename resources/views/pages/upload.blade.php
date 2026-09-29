@@ -10,7 +10,7 @@
     <div class="upload-panel card">
         <h1 id="upload-title">Share your photo</h1>
         <p class="upload-subtitle" id="upload-subtitle">JPG, PNG, WEBP · MP4, MOV · Max 200 MB</p>
-        <form id="upload-form" data-upload-endpoint="{{ config('media-upload.endpoint') }}" novalidate>
+        <form id="upload-form" data-upload-endpoint="{{ route('uploads.create') }}" novalidate>
             <input id="media-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" class="visually-hidden" aria-describedby="upload-subtitle upload-feedback">
             <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose a photo or video; you can also drop a file here">
                 <div id="drop-empty" class="drop-zone__empty">

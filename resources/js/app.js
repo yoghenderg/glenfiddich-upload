@@ -6,7 +6,7 @@ import '@fontsource/montserrat/latin-600.css';
 import '@fontsource/montserrat/latin-700.css';
 import { initPagination } from './gallery-pagination';
 import { ChunkedUpload } from './uploads/chunked-upload';
-import { demoTransport, httpTransport } from './uploads/transports';
+import { httpTransport } from './uploads/transports';
 import { prepareShareFile, shareMoment } from './share';
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -91,12 +91,12 @@ function initUpload() {
         feedback.textContent = 'Preparing your media…';
         label.textContent = 'Uploading…';
         try {
-            job ||= new ChunkedUpload(selected, form.dataset.uploadEndpoint ? httpTransport(form.dataset.uploadEndpoint) : demoTransport());
+            job ||= new ChunkedUpload(selected, httpTransport(form.dataset.uploadEndpoint));
             const result = await job.run({ signal: controller.signal,
                 onProgress: value => { progressBar.style.width = `${value}%`; progress.setAttribute('aria-valuenow', String(value)); label.textContent = `Uploading ${value}%`; },
                 onStatus: message => { feedback.textContent = message; },
             });
-            feedback.textContent = result.demo ? 'Preview complete — demo only.' : 'Upload complete.';
+            feedback.textContent = 'Upload complete. View it in the gallery.';
             label.textContent = 'Complete'; job = null;
             setBusy(false); button.disabled = true;
         } catch (error) {
@@ -141,7 +141,7 @@ function initGallery() {
         $('#viewer-time').textContent = item.time_display;
         $('#viewer-time').dateTime = item.captured_at;
         currentUrl = `${gallery.dataset.guestBase}/${encodeURIComponent(item.id)}`;
-        const download = $('#viewer-download'); download.href = item.src; download.download = item.filename;
+        const download = $('#viewer-download'); download.href = item.download || item.src; download.download = item.filename;
         feedback.textContent = '';
         try { await drawQr($('#viewer-qr'), currentUrl); }
         catch { feedback.textContent = 'QR code unavailable. Use Share instead.'; }
@@ -170,7 +170,7 @@ function initGallery() {
             if (!response.ok) throw new Error('Feed unavailable');
             const data = await response.json();
             status.dataset.status = 'live'; label.textContent = 'LIVE';
-            if ($('#media-grid') && data.items.map((item) => item.id).join() !== media.map((item) => item.id).join()) window.location.reload();
+            if (data.items.map((item) => item.id).join() !== media.map((item) => item.id).join()) window.location.reload();
         } catch { status.dataset.status = 'reconnecting'; label.textContent = 'RECONNECTING'; }
     };
     $('#retry-gallery')?.addEventListener('click', () => { window.location.href = gallery.dataset.feedUrl.replace('/feed', ''); });

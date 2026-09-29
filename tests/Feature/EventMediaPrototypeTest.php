@@ -19,7 +19,7 @@ class EventMediaPrototypeTest extends TestCase
     {
         $this->get('/upload')->assertRedirect(route('login'));
         $this->get('/gallery')->assertRedirect(route('login'));
-        $this->get('/media/moment-001')->assertOk();
+        $this->get('/media/moment-001')->assertNotFound();
         $this->get('/login')->assertOk()->assertSee('Sign in');
     }
 
@@ -37,9 +37,7 @@ class EventMediaPrototypeTest extends TestCase
     {
         $this->asEventStaff()->get('/upload')->assertOk()->assertSee('Share your photo');
         $this->asEventStaff()->get('/gallery')->assertOk()->assertSee('Media Gallery')->assertSee('No media yet')->assertDontSee('moment-001')->assertDontSee('media/paddock.jpg')->assertDontSee('Open on phone');
-        $this->get('/media/moment-001')->assertOk()->assertSee('Download photo')->assertDontSee('Share / AirDrop');
-        $this->get('/media/moment-032')->assertOk()->assertSee('Download photo');
-        $this->get('/media/moment-003')->assertOk()->assertSee('<video', false);
+
     }
 
     public function test_gallery_states_and_feed_are_available(): void

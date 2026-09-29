@@ -30,6 +30,21 @@ class Media extends Model
         });
     }
 
+    public function galleryItem(): array
+    {
+        $date = $this->captured_at ?? $this->created_at;
+
+        return [
+            'id' => $this->public_id, 'title' => $this->title ?: $this->original_filename,
+            'filename' => $this->original_filename, 'type' => $this->type,
+            'src' => route('media.file', $this), 'download' => route('media.download', $this),
+            'poster' => $this->type === 'image' ? route('media.file', $this) : '',
+            'mime_type' => $this->mime_type, 'alt' => $this->title ?: $this->original_filename,
+            'date' => $date->toDateString(), 'date_display' => $date->format('d-m-Y'),
+            'captured_at' => $date->toIso8601String(), 'time_display' => $date->format('h:i A'),
+        ];
+    }
+
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
