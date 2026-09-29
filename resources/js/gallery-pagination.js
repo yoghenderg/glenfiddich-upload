@@ -30,7 +30,7 @@ export function initPagination(gallery) {
         page = Number(page) + direction; render();
         // A disabled control cannot retain keyboard focus on every browser.
         (direction > 0 ? (next.disabled ? previous : next) : (previous.disabled ? next : previous)).focus({ preventScroll: true });
-        if (grid.getBoundingClientRect().top < 0) gallery.scrollIntoView({ block: 'start' });
+        gallery.querySelector('[data-gallery-scroll]')?.scrollTo({ top: 0, behavior: 'smooth' });
     };
     previous.addEventListener('click', () => changePage(-1));
     next.addEventListener('click', () => changePage(1));

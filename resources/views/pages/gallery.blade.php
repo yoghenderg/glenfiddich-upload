@@ -14,15 +14,17 @@
         <div class="gallery-heading__title"><h1 id="gallery-title">Media Gallery</h1><div id="live-status" class="live-status" data-status="{{ $state === 'ready' ? 'live' : $state }}" role="status" aria-live="polite"><span class="live-status__dot"></span><span id="live-label">{{ $state === 'ready' ? 'LIVE' : strtoupper($state) }}</span></div></div>
         <form class="gallery-sort" action="{{ route('gallery') }}" method="get"><label for="gallery-sort">Sort by</label><span class="gallery-sort__field"><select id="gallery-sort" name="sort"><option value="none" @selected($sort === 'none')>None</option><option value="today" @selected($sort === 'today')>Today</option><option value="yesterday" @selected($sort === 'yesterday')>Yesterday</option></select></span><button class="visually-hidden" type="submit">Apply sort</button></form>
     </div>
-    @if($state === 'loading')
-        <div class="media-grid" aria-label="Loading media">@for($i=0;$i<16;$i++)<div class="skeleton-card"><span></span><span></span></div>@endfor</div>
-    @elseif($state === 'error' || $state === 'reconnecting')
-        <div class="state-card"><span class="state-card__icon"><x-icon name="refresh" :size="28"/></span><h2>{{ $state === 'error' ? 'Gallery unavailable' : 'Reconnecting to gallery' }}</h2><p>{{ $state === 'error' ? 'Please try again.' : 'Trying to restore the connection.' }}</p><button class="button button--dark" id="retry-gallery" type="button">Try again</button></div>
-    @elseif(count($items) === 0)
-        <div class="state-card"><span class="state-card__icon"><x-icon name="image" :size="28"/></span><h2>No media yet</h2><p>Photos and videos will appear here.</p><a class="button button--dark" href="{{ route('upload') }}">Go to upload</a></div>
-    @else
-        <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item" :hidden="$loop->index >= 16" :priority="$loop->index < 4"/>@endforeach</div>
-    @endif
+    <div class="gallery-scroll" data-gallery-scroll tabindex="0" aria-label="Media gallery">
+        @if($state === 'loading')
+            <div class="media-grid" aria-label="Loading media">@for($i=0;$i<16;$i++)<div class="skeleton-card"><span></span><span></span></div>@endfor</div>
+        @elseif($state === 'error' || $state === 'reconnecting')
+            <div class="state-card"><span class="state-card__icon"><x-icon name="refresh" :size="28"/></span><h2>{{ $state === 'error' ? 'Gallery unavailable' : 'Reconnecting to gallery' }}</h2><p>{{ $state === 'error' ? 'Please try again.' : 'Trying to restore the connection.' }}</p><button class="button button--dark" id="retry-gallery" type="button">Try again</button></div>
+        @elseif(count($items) === 0)
+            <div class="state-card"><span class="state-card__icon"><x-icon name="image" :size="28"/></span><h2>No media yet</h2><p>Photos and videos will appear here.</p><a class="button button--dark" href="{{ route('upload') }}">Go to upload</a></div>
+        @else
+            <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item" :hidden="$loop->index >= 16" :priority="$loop->index < 4"/>@endforeach</div>
+        @endif
+    </div>
     @if($state === 'ready' && count($items) > 0)
     <nav class="pagination-bar" aria-label="Gallery pages">
         <span id="gallery-page-summary" role="status" aria-live="polite"><span id="media-count">{{ count($items) }}</span> items · Page 1 of {{ (int) ceil(count($items) / 16) }}</span>
