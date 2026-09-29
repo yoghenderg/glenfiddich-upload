@@ -86,7 +86,7 @@
   .gallery-heading { margin-bottom: 14px; }
   .gallery-heading h1 { font-size: 1.65rem; }
   .media-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .gallery-page .media-card__image-wrap { aspect-ratio: auto; height: clamp(72px, calc((100dvh - 324px) / 4 - 36px), 220px); }
+  .gallery-page .media-card__image-wrap { height: auto; aspect-ratio: 1066 / 1600; }
   .gallery-page .media-card__play { width: 28px; height: 28px; right: 8px; bottom: 8px; }
   .pagination-bar { min-height: 58px; padding: 6px 10px 6px 18px; margin-top: 12px; }
 }
@@ -100,10 +100,6 @@
   .media-grid { --gallery-page-size: 8; }
   .pagination-bar { flex-wrap: wrap; }
   .pagination-bar__controls { margin-left: auto; }
-}
-
-@media (min-width: 700px) and (orientation: landscape) {
-  .gallery-page .media-card__image-wrap img { object-position: center 10%; }
 }
 
 @media (min-width: 700px) and (any-pointer: coarse) {
