@@ -22,6 +22,7 @@ class UploadController extends Controller
         ]);
         abort_unless(in_array(strtolower(pathinfo($data['filename'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'mov']), 422, 'Unsupported file extension.');
         $session = UploadSession::firstOrCreate(['user_id' => $request->user()->id, 'idempotency_key' => $data['idempotency_key']], ['id' => (string) Str::uuid(), 'filename' => basename(str_replace('\\', '/', $data['filename'])), 'size' => $data['size']]);
+        abort_unless($session->size === (int) $data['size'] && $session->filename === basename(str_replace('\\', '/', $data['filename'])), 409, 'Upload key belongs to a different file.');
         abort_if($session->cancelled, 410, 'Upload was cancelled. Choose the file again.');
 
         return response()->json(['id' => $session->id, 'chunk_size' => self::CHUNK]);
@@ -62,6 +63,9 @@ class UploadController extends Controller
                 $stored = $request->file('chunk')->storeAs('uploads/'.$s->id, (string) $index, 'local');
                 abort_unless($stored, 500, 'Could not store upload chunk.');
                 $s->increment('next_index');
+            } else {
+                $existing = Storage::disk('local')->path('uploads/'.$s->id.'/'.$index);
+                abort_unless(is_file($existing) && hash_equals(hash_file('sha256', $existing), hash_file('sha256', $request->file('chunk')->getRealPath())), 409, 'Chunk differs from the accepted data.');
             }
 
             return response()->json(['next_index' => $index + 1]);

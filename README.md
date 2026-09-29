@@ -36,7 +36,9 @@ Set `EVENT_STAFF_NAME`, `EVENT_STAFF_EMAIL`, and `EVENT_STAFF_PASSWORD` in `.env
 
 The `media` table stores a generated UUID `public_id`, nullable uploader foreign key, original filename, storage disk/path, optional poster, image/video type, MIME type, byte size, optional dimensions/duration, capture time, and timestamps. Deleting a user preserves their media and clears the uploader reference. Paths identify stored files; file bytes do not belong in the database. Capture timestamps should be stored in UTC.
 
-Use `$user->media()->create([...])` after server-side validation and successful file storage to associate a completed upload with its staff uploader. The `Media` model generates the public UUID and uses it for future route binding. The default disk is private `local`; a future serving endpoint must deliberately authorize access. This migration does not connect the existing mock upload adapter, gallery, or guest routes to persisted media, or implement chunk upload sessions.
+The upload page now posts 1 MiB chunks to authenticated `/uploads` routes, validates the assembled file, and saves it on the private local disk. Gallery/feed and public UUID guest routes read persisted media. No storage symlink is required. Guest URLs grant access to the associated file; treat them as shareable links.
+
+Run `php artisan migrate` after updating. PHP and the web server must accept a 1 MiB chunk plus multipart overhead (`upload_max_filesize=2M`, `post_max_size=3M`, web-server body limit at least 3 MiB). Enable Laravel's scheduler (`php artisan schedule:run` every minute) to clean unfinished uploads older than 24 hours. Browser playback of MOV depends on its codec; files are not transcoded.
 
 ## GitHub handoff
 
@@ -44,8 +46,8 @@ Commit the Laravel project files at the repository root so Carlo sees `app`, `re
 
 ## What is interactive today
 
-- Upload: drag/drop or file picker, image/video preview, type and 200 MB size checks, choose another file, 1 MiB sequential chunk coordination, progress, cancellation, retry and completion through a mock adapter. **It does not save or publish files.** This keeps the prototype on dummy data until the real upload endpoint is connected.
-- Gallery: 32 mock records reusing the three sample assets, date labels in `dd-mm-yyyy` with smaller 12-hour times on the right, a None/Today/Yesterday date selector, image and playable sample video, detail viewer, usable QR to the guest route, download, native Share/AirDrop sheet on supporting devices and copy-link fallback. The page checks `/gallery/feed?sort=…` every 20 seconds, shows a reconnecting indicator if it fails, and reloads when item IDs change.
+- Upload: drag/drop or file picker, image/video preview, type and 200 MB size checks, choose another file, 1 MiB sequential chunk coordination, progress, cancellation, retry and completion through the Laravel upload API. **Files are saved and published to the gallery after server validation.**
+- Gallery: database-backed uploaded media, date labels in `dd-mm-yyyy` with smaller 12-hour times on the right, a None/Today/Yesterday date selector, image and playable sample video, detail viewer, usable QR to the guest route, download, native Share/AirDrop sheet on supporting devices and copy-link fallback. The page checks `/gallery/feed?sort=…` every 20 seconds, shows a reconnecting indicator if it fails, and reloads when item IDs change.
 - Guest: shared partner logo, one image or video, and one download action. This is the destination encoded in each gallery QR.
 - State previews: `/gallery?state=empty`, `loading`, `error`, or `reconnecting`.
 

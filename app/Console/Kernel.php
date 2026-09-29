@@ -12,7 +12,20 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->call(function (): void {
+            \App\Models\UploadSession::whereNull('media_id')->where('updated_at', '<', now()->subDay())
+                ->pluck('id')->each(function ($id): void {
+                    \Illuminate\Support\Facades\DB::transaction(function () use ($id): void {
+                        $session = \App\Models\UploadSession::lockForUpdate()->find($id);
+                        if (! $session || $session->media_id || $session->updated_at->greaterThanOrEqualTo(now()->subDay())) {
+                            return;
+                        }
+                        \Illuminate\Support\Facades\Storage::disk('local')->deleteDirectory('uploads/'.$session->id);
+                        \Illuminate\Support\Facades\Storage::disk('local')->delete('media/'.$session->id);
+                        $session->delete();
+                    });
+                });
+        })->name('cleanup-abandoned-uploads')->hourly()->withoutOverlapping();
     }
 
     /**
