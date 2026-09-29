@@ -10,9 +10,15 @@ final class RequireEventStaffLogin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! (bool) $request->session()->get('event_staff.authenticated', false)) {
+        if (! $request->user()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+
             return redirect()->guest(route('login'));
         }
+
+        abort_unless($request->user()->is_staff, 403);
 
         return $next($request);
     }

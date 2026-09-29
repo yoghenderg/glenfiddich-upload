@@ -26,17 +26,13 @@ final class DemoMediaController extends Controller
             $sort = 'none';
         }
 
-        return view('pages.gallery', ['items' => $state === 'empty' ? [] : DemoMedia::sorted($sort), 'state' => $state, 'sort' => $sort]);
+        return view('pages.gallery', ['items' => [], 'state' => $state, 'sort' => $sort]);
     }
 
     public function feed(Request $request): JsonResponse
     {
-        $sort = $request->query('sort', 'none');
-        if (! in_array($sort, ['none', 'today', 'yesterday'], true)) {
-            $sort = 'none';
-        }
-
-        return response()->json(['items' => DemoMedia::sorted($sort), 'updated_at' => now()->toIso8601String()]);
+        // Real uploads will populate the gallery when persistence is connected.
+        return response()->json(['items' => [], 'updated_at' => now()->toIso8601String()]);
     }
 
     public function guest(string $id): View

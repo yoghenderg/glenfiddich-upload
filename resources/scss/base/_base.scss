@@ -18,6 +18,7 @@ button { color: inherit; }
 .skip-link:focus { top: 1rem; }
 
 .site-header {
+  position: relative;
   width: min(calc(100% - 80px), 1160px);
   margin: 0 auto;
   padding: clamp(27px, 4vh, 46px) 0 0;
@@ -78,4 +79,28 @@ button { color: inherit; }
   .site-header { padding-top: 16px; }
   .brand { width: 235px; }
   .site-nav { margin-top: 11px; }
+}
+
+.staff-toolbar {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  right: 0;
+  z-index: 1;
+}
+.signout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(240, 250, 245, .25);
+  border-radius: 50%;
+  background: rgba(229, 244, 234, .085);
+  color: #fff;
+  font-size: 17px;
+  transition: background .2s ease;
+}
+@media (hover: hover) {
+  .signout-button:hover { background: rgba(255, 255, 255, .2); }
 }

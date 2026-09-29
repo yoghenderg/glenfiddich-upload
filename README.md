@@ -19,14 +19,24 @@ Open `/upload`, `/gallery`, and `/media/moment-001`. Use the host machine's LAN 
 
 ## Staff access
 
-`/upload`, `/gallery`, and `/gallery/feed` require a staff session. `/media/{id}` stays public because it is the QR guest destination. Set these values in the deployment `.env`; they are deliberately blank in the repository and must not be committed with real credentials:
+`/upload`, `/gallery`, and `/gallery/feed` require a database user with `is_staff = true`. `/media/{id}` remains the public demo guest destination. Passwords are hashed; sign-in rotates the session ID, checks staff access, and limits attempts. Sign out invalidates the session. There is no public registration.
 
-```dotenv
-EVENT_STAFF_EMAIL=staff@example.com
-EVENT_STAFF_PASSWORD=use-a-long-unique-password
+Configure your database using `DB_*` in `.env`, then run:
+
+```bash
+php artisan migrate
+php artisan db:seed
 ```
 
-The prototype uses Laravel's encrypted session and rotates the session ID on a successful sign-in. It also limits failed login attempts. Carlo can replace this small environment-backed gate with database users, SSO, or the event's preferred Laravel auth provider later without changing the protected route grouping in `routes/web.php`.
+Set `EVENT_STAFF_NAME`, `EVENT_STAFF_EMAIL`, and `EVENT_STAFF_PASSWORD` in `.env` before seeding. Use a password of 12–72 characters. If configuration is cached, run `php artisan config:clear` after editing `.env`.
+
+`DatabaseSeeder` calls `EventStaffSeeder`, which creates or updates the account matching the configured email, grants staff access, and hashes the password. Rerunning it updates the name/password without duplicating the account; changing the email creates a separate account and does not remove the old one. Missing or invalid credentials stop seeding. Login checks the database; `.env` changes take effect after reseeding. Never commit real credentials.
+
+## Upload database foundation
+
+The `media` table stores a generated UUID `public_id`, nullable uploader foreign key, original filename, storage disk/path, optional poster, image/video type, MIME type, byte size, optional dimensions/duration, capture time, and timestamps. Deleting a user preserves their media and clears the uploader reference. Paths identify stored files; file bytes do not belong in the database. Capture timestamps should be stored in UTC.
+
+Use `$user->media()->create([...])` after server-side validation and successful file storage to associate a completed upload with its staff uploader. The `Media` model generates the public UUID and uses it for future route binding. The default disk is private `local`; a future serving endpoint must deliberately authorize access. This migration does not connect the existing mock upload adapter, gallery, or guest routes to persisted media, or implement chunk upload sessions.
 
 ## GitHub handoff
 

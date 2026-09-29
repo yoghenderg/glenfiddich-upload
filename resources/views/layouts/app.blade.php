@@ -13,11 +13,22 @@
 <body class="aston-page @yield('body-class')">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
+    @if(auth()->check() && request()->routeIs('upload'))
+        <div class="staff-toolbar">
+            <form action="{{ route('logout') }}" method="post">
+                @csrf
+                <button class="signout-button" type="submit" aria-label="Sign out" title="Sign out">
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    @endif
         <a class="brand" href="{{ route('upload') }}" aria-label="Aston Martin Formula One Team and Glenfiddich, upload home">
             <img src="{{ asset('media/partner-logo.png') }}" alt="Aston Martin Formula One Team and Glenfiddich Global Partner" width="2048" height="1180">
         </a>
         @hasSection('navigation')
-            <nav class="site-nav" aria-label="Main navigation">@yield('navigation')</nav>
+            <nav class="site-nav" aria-label="Main navigation">@yield('navigation')
+            </nav>
         @endif
     </header>
     <main id="main" class="page-shell">@yield('content')</main>

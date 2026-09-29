@@ -12,6 +12,11 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public function media(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Media::class, 'uploaded_by');
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -39,6 +44,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
+        'is_staff' => 'boolean',
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
