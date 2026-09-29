@@ -22,6 +22,7 @@
 .viewer__media .media-display { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover; }
 .viewer__sidebar { min-width: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: 68px clamp(24px, 3vw, 34px) 32px; border-left: 1px solid rgba(246, 255, 247, .15); }
 .viewer__sidebar > * { width: min(100%, 286px); }
+.viewer__brand { width: min(150px, calc(100% - 58px)); height: auto; object-fit: contain; }
 .viewer__sidebar h2 { margin: 0; color: #f1f8f1; font-size: 1.08rem; font-weight: 600; letter-spacing: -.025em; }
 .viewer__timestamp { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .viewer__timestamp time { color: #b9cbc2; font-size: .68rem; font-weight: 500; letter-spacing: 0; white-space: nowrap; }
@@ -36,12 +37,14 @@
   .viewer__dialog { width: min(95vw, 730px); grid-template-columns: minmax(0, 1.18fr) minmax(238px, .78fr); }
   .viewer__sidebar { gap: 13px; padding: 54px 18px 22px; }
   .viewer__sidebar > * { width: min(100%, 250px); }
+  .viewer__brand { width: min(132px, calc(100% - 60px)); }
   .viewer__qr-area { padding: 12px; }
   .qr-frame canvas { width: 138px !important; height: 138px !important; }
 }
 @media (orientation: landscape) and (max-height: 650px) {
   .viewer__dialog { height: min(91dvh, 560px); min-height: 0; }
   .viewer__sidebar { gap: 10px; padding: 46px 18px 18px; }
+  .viewer__brand { width: 116px; }
   .viewer__qr-area { padding: 10px; }
   .viewer__qr-label { margin-bottom: 8px; }
   .qr-frame canvas { width: 118px !important; height: 118px !important; }
@@ -55,6 +58,7 @@
   .viewer__media { flex: 0 0 auto; height: min(46dvh, 440px); margin: max(55px, env(safe-area-inset-top)) 12px 0; border-radius: 13px; }
   .viewer__sidebar { justify-content: flex-start; gap: 15px; padding: 21px 18px max(21px, env(safe-area-inset-bottom)); border: 0; }
   .viewer__sidebar > * { width: 100%; }
+  .viewer__brand { width: 148px; margin-inline: auto; }
   .viewer__qr-area { align-self: center; width: min(100%, 260px); }
   .viewer__actions { grid-template-columns: 1fr 1fr; }
   .viewer__actions .button { min-height: 43px; padding: 8px 10px; font-size: .63rem; }

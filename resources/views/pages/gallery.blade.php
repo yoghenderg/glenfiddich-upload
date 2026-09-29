@@ -42,6 +42,7 @@
         <button class="viewer__close icon-button" type="button" data-close-viewer aria-label="Close media viewer"><x-icon name="close" :size="18"/></button>
         <div class="viewer__media" id="viewer-media"></div>
         <aside class="viewer__sidebar">
+            <img class="viewer__brand" src="{{ asset('media/partner-logo-trim.png') }}" alt="Aston Martin Formula One Team and Glenfiddich Global Partner" width="1596" height="663">
             <h2 id="viewer-title" class="viewer__timestamp"><span id="viewer-date"></span><time id="viewer-time"></time></h2>
             <div class="viewer__qr-area"><p class="viewer__qr-label">SCAN TO DOWNLOAD</p><div class="qr-frame"><canvas id="viewer-qr" width="160" height="160" aria-label="QR code for this moment"></canvas></div></div>
             <div class="viewer__actions"><a id="viewer-download" class="button button--dark" download><x-icon name="download" :size="17"/> Download</a><button type="button" id="viewer-share" class="button button--soft"><x-icon name="airdrop" :size="19"/> Share / AirDrop</button></div>
