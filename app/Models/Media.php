@@ -40,6 +40,7 @@ class Media extends Model
             'src' => route('media.file', $this), 'download' => route('media.download', $this),
             'poster' => $this->type === 'image' ? route('media.file', $this) : '',
             'mime_type' => $this->mime_type, 'alt' => $this->title ?: $this->original_filename,
+            'width' => $this->width, 'height' => $this->height,
             'date' => $date->toDateString(), 'date_display' => $date->format('d-m-Y'),
             'captured_at' => $date->toIso8601String(), 'time_display' => $date->format('h:i A'),
         ];
