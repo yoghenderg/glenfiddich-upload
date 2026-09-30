@@ -45,7 +45,11 @@
             <img class="viewer__brand" src="{{ asset('media/partner-logo-trim.png') }}" alt="Aston Martin Formula One Team and Glenfiddich Global Partner" width="1596" height="663">
             <h2 id="viewer-title" class="viewer__timestamp"><span id="viewer-date"></span><time id="viewer-time"></time></h2>
             <div class="viewer__qr-area"><p class="viewer__qr-label">SCAN TO DOWNLOAD</p><div class="qr-frame"><canvas id="viewer-qr" width="160" height="160" aria-label="QR code for this moment"></canvas></div></div>
-            <div class="viewer__actions"><a id="viewer-download" class="button button--dark" download><x-icon name="download" :size="17"/> Download</a><button type="button" id="viewer-share" class="button button--soft"><x-icon name="airdrop" :size="19"/> Share / AirDrop</button></div>
+            <div class="viewer__actions" aria-label="Photo actions">
+                <a id="viewer-download" class="button button--soft" download aria-label="Download photo" title="Download"><x-icon name="download" :size="21"/></a>
+                <button type="button" id="viewer-share" class="button button--soft" aria-label="Share / AirDrop" title="Share / AirDrop"><x-icon name="airdrop" :size="23"/></button>
+                <button type="button" id="viewer-print" class="button button--soft" aria-label="Print photo at 4 by 6 inches" title="Print 4R photo"><x-icon name="print" :size="21"/></button>
+            </div>
             <p class="viewer__hint" id="viewer-hint" role="status" aria-live="polite"></p>
         </aside>
     </section>

@@ -1,3 +1,4 @@
+import { printPhoto } from './print';
 import '@fortawesome/fontawesome-free/css/fontawesome.css';
 import '@fortawesome/fontawesome-free/css/solid.css';
 import '@fontsource/montserrat/latin-400.css';
@@ -142,6 +143,7 @@ function initGallery() {
         $('#viewer-time').dateTime = item.captured_at;
         currentUrl = `${gallery.dataset.guestBase}/${encodeURIComponent(item.id)}`;
         const download = $('#viewer-download'); download.href = item.download || item.src; download.download = item.filename;
+        $('#viewer-print').disabled = item.type !== 'image';
         feedback.textContent = '';
         try { await drawQr($('#viewer-qr'), currentUrl); }
         catch { feedback.textContent = 'QR code unavailable. Use Share instead.'; }
@@ -161,6 +163,7 @@ function initGallery() {
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
+    $('#viewer-print').addEventListener('click', () => current?.type === 'image' && printPhoto(current, feedback));
     $('#viewer-share').addEventListener('click', () => current && shareMoment(current, currentUrl, feedback, shareFile));
     $('#gallery-sort')?.addEventListener('change', (event) => event.target.form.requestSubmit());
     const status = $('#live-status'), label = $('#live-label');

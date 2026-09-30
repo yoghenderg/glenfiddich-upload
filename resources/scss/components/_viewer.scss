@@ -77,3 +77,12 @@
 }
 
 .viewer__hint:empty { display: none; }
+
+// Keep the three touch targets balanced at every viewer breakpoint.
+.viewer__actions { display: flex; justify-content: center; align-items: center; gap: 16px; }
+.viewer__actions .button { flex: 0 0 52px; width: 52px; height: 52px; min-height: 52px; padding: 0; border-radius: 50%; }
+.viewer__actions .button svg { flex-shrink: 0; overflow: visible; }
+.viewer__actions .button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.viewer__actions .button:disabled { opacity: .45; cursor: default; }
+
+.viewer__actions .button:active:not(:disabled) { background: #fff; color: #123a39; border-color: #fff; }
