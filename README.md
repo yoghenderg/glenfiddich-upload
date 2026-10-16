@@ -1,6 +1,6 @@
 # YG event media frontend prototype
 
-Laravel 10, Blade, Vite, vanilla JavaScript and custom SCSS. The prototype includes tablet upload and gallery screens in both orientations, a gallery preview/download dialog, and a streamlined mobile page for QR guests. The supplied Aston Martin Formula One Team × Glenfiddich logo appears in the shared header. The primary page colour is `#033037`, and Montserrat is bundled locally.
+Laravel 10, Blade, Vite, vanilla JavaScript and custom SCSS. The prototype includes tablet upload and gallery screens in both orientations, a gallery preview/download dialog, and a streamlined mobile page for QR guests. The supplied Ray-Ban logo appears in the shared header. The primary page colour is `#BC0001`, and Montserrat is bundled locally.
 
 ## Run locally
 

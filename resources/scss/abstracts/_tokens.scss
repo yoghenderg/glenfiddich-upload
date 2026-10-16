@@ -1,4 +1,4 @@
-$forest: #033037;
+$brand-red: #BC0001;
 $forest-deep: #01272d;
 $surface: #12464a;
 $paper: #f3f5eb;
@@ -15,7 +15,7 @@ $space-4: 2rem;
 $space-5: 3rem;
 
 :root {
-  --color-background: #{$forest};
+  --color-background: #{$brand-red};
   --color-surface: #{$surface};
   --color-paper: #{$paper};
   --color-ink: #{$ink};

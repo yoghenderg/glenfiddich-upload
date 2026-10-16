@@ -17,7 +17,7 @@ export async function printPhoto(item, feedback) {
         style.textContent = `
             @page { size: 4in 6in; margin: 0; }
             * { box-sizing: border-box; }
-            html, body { margin: 0; padding: 0; background: #033037; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            html, body { margin: 0; padding: 0; background: #BC0001; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
             img { position: fixed; inset: 0; margin: auto; display: block; width: 4in; height: 6in; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; }
         `;
         doc.head.append(style);

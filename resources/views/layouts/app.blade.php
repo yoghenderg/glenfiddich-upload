@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#033037">
-    <meta name="description" content="Aston Martin Formula One Team x Glenfiddich event moments">
-    <title>@yield('title', 'Event moments') · Aston Martin F1 x Glenfiddich</title>
+    <meta name="theme-color" content="#BC0001">
+    <meta name="description" content="Ray-Ban event moments">
+    <title>@yield('title', 'Ray-Ban Moments') · Ray-Ban</title>
     @stack('head')
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
-<body class="aston-page @yield('body-class')">
+<body class="rayban-page @yield('body-class')">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
     @if(auth()->check() && request()->routeIs('upload'))
@@ -23,8 +23,8 @@
             </form>
         </div>
     @endif
-        <a class="brand" href="{{ route('upload') }}" aria-label="Aston Martin Formula One Team and Glenfiddich, upload home">
-            <img src="{{ asset('media/partner-logo.png') }}" alt="Aston Martin Formula One Team and Glenfiddich Global Partner" width="2048" height="1180">
+        <a class="brand" href="{{ route('upload') }}" aria-label="Ray-Ban, upload home">
+            <img src="{{ asset('media/partner-logo.png') }}" alt="Ray-Ban" width="2048" height="1180">
         </a>
         @hasSection('navigation')
             <nav class="site-nav" aria-label="Main navigation">@yield('navigation')

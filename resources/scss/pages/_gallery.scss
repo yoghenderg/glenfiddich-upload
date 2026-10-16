@@ -115,7 +115,7 @@
 .gallery-scroll { padding-bottom: calc(108px + env(safe-area-inset-bottom)); scroll-padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
 .gallery-content:has(.pagination-bar)::after {
   content: ''; position: absolute; z-index: 1; inset: auto -4px 0; height: calc(116px + env(safe-area-inset-bottom)); pointer-events: none;
-  background: linear-gradient(to bottom, rgba(3, 48, 55, 0), rgba(3, 48, 55, .76) 75%, #033037);
+  background: linear-gradient(to bottom, rgba(188, 0, 1, 0), rgba(188, 0, 1, .76) 75%, #BC0001);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 42%); mask-image: linear-gradient(to bottom, transparent, #000 42%);
 }
