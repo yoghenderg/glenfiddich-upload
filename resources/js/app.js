@@ -165,7 +165,6 @@ function initGallery() {
     });
     $('#viewer-print').addEventListener('click', () => current?.type === 'image' && printPhoto(current, feedback));
     $('#viewer-share').addEventListener('click', () => current && shareMoment(current, currentUrl, feedback, shareFile));
-    $('#gallery-sort')?.addEventListener('change', (event) => event.target.form.requestSubmit());
     const status = $('#live-status'), label = $('#live-label');
     const checkFeed = async () => {
         try {

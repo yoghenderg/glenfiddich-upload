@@ -10,6 +10,7 @@
     @case('print') <path d="M7 8V3h10v5M7 17H4V9h16v8h-3"/><path d="M7 14h10v7H7z"/><path d="M17 11h.01"/> @break
     @case('close') <path d="M5 5 19 19M19 5 5 19"/> @break
     @case('arrow') <path d="M4 12h16m0 0-6-6m6 6-6 6"/> @break
+    @case('filter') <path d="M4 6h16M7 12h10m-7 6h4"/><circle cx="8" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><circle cx="11" cy="18" r="1.5" fill="currentColor"/> @break
     @case('check') <path d="m4 12 5 5L20 6"/> @break
     @case('refresh') <path d="M20 11a8 8 0 1 0-2 6M20 4v7h-7"/> @break
 @endswitch

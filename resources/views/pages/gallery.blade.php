@@ -20,7 +20,25 @@
                 </div>
             </div>
         </div>
-        <form class="gallery-sort" action="{{ route('gallery') }}" method="get"><label for="gallery-sort">Sort by</label><span class="gallery-sort__field"><select id="gallery-sort" name="sort"><option value="none" @selected($sort === 'none')>None</option><option value="today" @selected($sort === 'today')>Today</option><option value="yesterday" @selected($sort === 'yesterday')>Yesterday</option></select></span><button class="visually-hidden" type="submit">Apply sort</button></form>
+        <details class="gallery-sort">
+            <summary class="gallery-sort__trigger" aria-label="Filter gallery by date" title="Filter gallery by date">
+                <x-icon name="filter" :size="19"/>
+            </summary>
+            <nav class="gallery-sort__menu" aria-label="Filter gallery by date">
+                <a href="{{ route('gallery', ['sort' => 'none']) }}" @if($sort === 'none') aria-current="page" @endif>
+                    <span>All dates</span>
+                    @if($sort === 'none')<x-icon name="check" :size="16"/>@endif
+                </a>
+                <a href="{{ route('gallery', ['sort' => 'today']) }}" @if($sort === 'today') aria-current="page" @endif>
+                    <span>Today</span>
+                    @if($sort === 'today')<x-icon name="check" :size="16"/>@endif
+                </a>
+                <a href="{{ route('gallery', ['sort' => 'yesterday']) }}" @if($sort === 'yesterday') aria-current="page" @endif>
+                    <span>Yesterday</span>
+                    @if($sort === 'yesterday')<x-icon name="check" :size="16"/>@endif
+                </a>
+            </nav>
+        </details>
     </div>
     <div class="gallery-scroll" data-gallery-scroll tabindex="0" aria-label="Media gallery">
         @if($state === 'loading')
