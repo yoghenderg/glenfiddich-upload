@@ -11,7 +11,15 @@
 @section('content')
 <section class="gallery-content" data-gallery data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">
     <div class="gallery-heading">
-        <div class="gallery-heading__title"><h1 id="gallery-title">Media Gallery</h1><div id="live-status" class="live-status" data-status="{{ $state === 'ready' ? 'live' : $state }}" role="status" aria-live="polite"><span class="live-status__dot"></span><span id="live-label">{{ $state === 'ready' ? 'LIVE' : strtoupper($state) }}</span></div></div>
+        <div class="gallery-heading__title">
+            <div class="gallery-heading__copy">
+                <p class="gallery-heading__eyebrow">RAY-BAN MOMENTS</p>
+                <div class="gallery-heading__title-row">
+                    <h1 id="gallery-title">Captured moments</h1>
+                    <div id="live-status" class="live-status" data-status="{{ $state === 'ready' ? 'live' : $state }}" role="status" aria-live="polite"><span class="live-status__dot"></span><span id="live-label">{{ $state === 'ready' ? 'LIVE' : strtoupper($state) }}</span></div>
+                </div>
+            </div>
+        </div>
         <form class="gallery-sort" action="{{ route('gallery') }}" method="get"><label for="gallery-sort">Sort by</label><span class="gallery-sort__field"><select id="gallery-sort" name="sort"><option value="none" @selected($sort === 'none')>None</option><option value="today" @selected($sort === 'today')>Today</option><option value="yesterday" @selected($sort === 'yesterday')>Yesterday</option></select></span><button class="visually-hidden" type="submit">Apply sort</button></form>
     </div>
     <div class="gallery-scroll" data-gallery-scroll tabindex="0" aria-label="Media gallery">

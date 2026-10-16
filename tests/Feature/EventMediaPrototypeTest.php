@@ -36,7 +36,7 @@ class EventMediaPrototypeTest extends TestCase
     public function test_upload_gallery_and_guest_pages_render(): void
     {
         $this->asEventStaff()->get('/upload')->assertOk()->assertSee('Share your photo');
-        $this->asEventStaff()->get('/gallery')->assertOk()->assertSee('Media Gallery')->assertSee('No media yet')->assertDontSee('moment-001')->assertDontSee('media/paddock.jpg')->assertDontSee('Open on phone');
+        $this->asEventStaff()->get('/gallery')->assertOk()->assertSee('Captured moments')->assertSee('RAY-BAN MOMENTS')->assertSee('No media yet')->assertDontSee('moment-001')->assertDontSee('media/paddock.jpg')->assertDontSee('Open on phone');
 
     }
 
