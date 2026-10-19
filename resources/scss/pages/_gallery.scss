@@ -170,9 +170,12 @@
 .media-card__actions button:focus-visible, .media-card__image-wrap:focus-visible { outline: 2px solid #BC0001; outline-offset: -2px; }
 .media-card__hint { margin: 4px 6px 8px; color: #716869; font-size: .7rem; text-align: center; }
 .media-card__hint:empty { display: none; }
-@media (min-width: 768px) and (max-width: 1399px) {
+@media (min-width: 600px) and (max-width: 1399px), (min-width: 600px) and (any-pointer: coarse) {
   .gallery-page .media-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
   .gallery-page .media-card__actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 600px) and (max-width: 767px) {
+  .gallery-page .media-card__actions button { flex-direction: column; gap: 4px; font-size: .65rem; }
 }
 @media (max-width: 460px) { .media-card__actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .gallery-page .media-card__date { color: #241d1d; }
