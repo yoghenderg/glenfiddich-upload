@@ -34,4 +34,5 @@ Route::middleware('event.staff')->group(function (): void {
 Route::get('/media/{id}', [DemoMediaController::class, 'guest'])->name('media.guest');
 
 Route::get('/media/{media}/file', [DemoMediaController::class, 'file'])->name('media.file');
+Route::get('/media/{media}/thumbnail', [DemoMediaController::class, 'thumbnail'])->name('media.thumbnail');
 Route::get('/media/{media}/download', [DemoMediaController::class, 'download'])->name('media.download');

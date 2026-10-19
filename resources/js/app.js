@@ -5,8 +5,8 @@ import '@fontsource/montserrat/latin-400.css';
 import '@fontsource/montserrat/latin-500.css';
 import '@fontsource/montserrat/latin-600.css';
 import '@fontsource/montserrat/latin-700.css';
-import { initPagination, pageWindow } from './gallery-pagination';
-import { preloadGalleryImages } from './gallery-images';
+import { initPagination, galleryPageSize } from './gallery-pagination';
+import { reconcileGalleryCards } from './gallery-updates';
 import { initWorkspace } from './workspace';
 import { ChunkedUpload } from './uploads/chunked-upload';
 import { httpTransport } from './uploads/transports';
@@ -299,51 +299,80 @@ function initGallery() {
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
-    let feedRequest = null;
-    let requestedSort = null;
-    let loadedSort = new URL(gallery.dataset.feedUrl).searchParams.get('sort') || 'none';
-    let lastChecked = Date.now();
+    let feedRequest = null, requestedKey = null;
+    let targetPage = window.galleryPagination.page;
+    let targetSize = window.galleryPagination.per_page;
+    const sortForFeed = () => new URL(gallery.dataset.feedUrl).searchParams.get('sort') || 'none';
+    const keyFor = (sort, page, size) => `${sort}|${page}|${size}`;
+    let loadedKey = keyFor(sortForFeed(), targetPage, targetSize);
+    let loadedVersion = window.galleryVersion;
+    const pageCache = new Map();
+    if (gallery.dataset.galleryState === 'ready') pageCache.set(loadedKey, {
+        items: media, pagination: window.galleryPagination, version: loadedVersion,
+        html: $('[data-gallery-results]', gallery).innerHTML, checkedAt: Date.now(),
+    });
     const galleryLoading = $('[data-gallery-loading]', gallery);
-    const checkFeed = async (force = false) => {
+    const applyPage = (data, sort, scroll = false) => {
+        const results = $('[data-gallery-results]', gallery);
+        const oldScroll = $('[data-gallery-scroll]', gallery)?.scrollTop || 0;
+        const incoming = document.createElement('div');
+        incoming.innerHTML = data.html;
+        const currentGrid = $('#media-grid', results), incomingGrid = $('#media-grid', incoming);
+        disposePagination?.();
+        if (currentGrid && incomingGrid && $('#gallery-pagination', results)) {
+            reconcileGalleryCards(currentGrid, incomingGrid, media, data.items);
+        } else {
+            results.replaceChildren(...incoming.childNodes);
+        }
+        media = data.items;
+        targetPage = data.pagination.page;
+        targetSize = data.pagination.per_page;
+        loadedKey = keyFor(sort, targetPage, targetSize);
+        loadedVersion = data.version;
+        gallery.dataset.galleryState = 'ready';
+        disposePagination = initPagination(gallery, { pagination: data.pagination });
+        $('[data-gallery-scroll]', gallery)?.scrollTo({ top: scroll ? 0 : oldScroll });
+    };
+    const checkFeed = async (force = false, options = {}) => {
         if (document.body.classList.contains('viewer-open')) return;
+        targetPage = Math.max(1, Number(options.page ?? targetPage) || 1);
+        targetSize = options.perPage ?? targetSize;
         const feedUrl = new URL(gallery.dataset.feedUrl);
-        const sort = feedUrl.searchParams.get('sort') || 'none';
-        if (!force && feedRequest && requestedSort === sort) return;
+        const sort = sortForFeed();
+        const key = keyFor(sort, targetPage, targetSize);
+        if (!force && feedRequest && requestedKey === key) return;
         feedRequest?.abort();
         feedRequest = null;
         galleryLoading.hidden = true;
-        if (!force && sort === loadedSort && gallery.dataset.galleryState === 'ready' && Date.now() - lastChecked < 15000) return;
+        if (force) pageCache.clear();
+        const cached = pageCache.get(key);
+        if (cached && key !== loadedKey) applyPage(cached, sort, options.scroll);
+        if (!force && cached && gallery.dataset.galleryState === 'ready' && Date.now() - cached.checkedAt < 15000) return;
         const controller = new AbortController();
         feedRequest = controller;
-        requestedSort = sort;
+        requestedKey = key;
         galleryLoading.hidden = false;
+        feedUrl.searchParams.set('page', targetPage);
+        feedUrl.searchParams.set('per_page', targetSize);
         const hint = $('[data-gallery-feedback]', gallery);
+        const headers = { Accept: 'application/json' };
+        if (cached) headers['If-None-Match'] = `"${cached.version}"`;
         try {
-            const response = await fetch(feedUrl, { signal: controller.signal, cache: 'no-store', headers: { Accept: 'application/json' } });
+            const response = await fetch(feedUrl, { signal: controller.signal, cache: 'no-store', headers });
+            if (controller.signal.aborted) return;
+            if (response.status === 304 && cached) {
+                cached.checkedAt = Date.now();
+                hint.textContent = '';
+                return;
+            }
             if (!response.ok) throw new Error('Feed unavailable');
             const data = await response.json();
             if (controller.signal.aborted || document.body.classList.contains('viewer-open')) return;
-            if (sort !== loadedSort || gallery.dataset.galleryState !== 'ready' || JSON.stringify(data.items) !== JSON.stringify(media)) {
-                // Show the new cards immediately; each preview has its own loader.
-                const incoming = document.createElement('div');
-                incoming.innerHTML = data.html;
-                const cards = [...incoming.querySelectorAll('[data-media-card]')];
-                const grid = $('#media-grid', gallery);
-                const size = grid ? parseInt(getComputedStyle(grid).getPropertyValue('--gallery-page-size'), 10) || 16 : 16;
-                const page = pageWindow(cards.length, size, sort !== loadedSort ? 1 : gallery.dataset.page || 1);
-                cards.forEach((card, index) => { card.hidden = index < page.start || index >= page.end; });
-                void preloadGalleryImages(incoming);
-                if (controller.signal.aborted || document.body.classList.contains('viewer-open')) return;
-                const scrollTop = $('[data-gallery-scroll]', gallery)?.scrollTop || 0;
-                disposePagination?.();
-                media = data.items;
-                $('[data-gallery-results]', gallery).replaceChildren(...incoming.childNodes);
-                disposePagination = initPagination(gallery, { reset: sort !== loadedSort });
-                if (sort === loadedSort) $('[data-gallery-scroll]', gallery)?.scrollTo({ top: scrollTop });
-                loadedSort = sort;
-                gallery.dataset.galleryState = 'ready';
-            }
-            lastChecked = Date.now();
+            if (key !== loadedKey || data.version !== loadedVersion || gallery.dataset.galleryState !== 'ready') applyPage(data, sort, options.scroll);
+            const canonicalKey = keyFor(sort, data.pagination.page, data.pagination.per_page);
+            pageCache.delete(canonicalKey);
+            pageCache.set(canonicalKey, { ...data, checkedAt: Date.now() });
+            while (pageCache.size > 3) pageCache.delete(pageCache.keys().next().value);
             hint.textContent = '';
         } catch (error) {
             if (error.name !== 'AbortError') hint.textContent = 'Could not refresh the gallery. Try again shortly.';
@@ -357,23 +386,28 @@ function initGallery() {
     gallery.addEventListener('click', event => {
         if (event.target.closest('#retry-gallery')) checkFeed(true);
     });
+    gallery.addEventListener('gallery:request', event => checkFeed(false, event.detail));
     document.addEventListener('workspace:view', event => {
         if (event.detail.view !== 'gallery') return;
         const sort = event.detail.url.searchParams.get('sort') || 'none';
         const feedUrl = new URL(gallery.dataset.feedUrl);
+        const changedSort = sort !== sortForFeed();
         feedUrl.searchParams.set('sort', sort);
         gallery.dataset.feedUrl = feedUrl.href;
-        gallery.dispatchEvent(new Event('gallery:paginate'));
         gallery.querySelectorAll('.gallery-sort__menu a').forEach(link => {
             const selected = (new URL(link.href).searchParams.get('sort') || 'none') === sort;
             $('[data-sort-check]', link).hidden = !selected;
             if (selected) link.setAttribute('aria-current', 'page');
             else link.removeAttribute('aria-current');
         });
-        checkFeed();
+        checkFeed(false, {
+            page: Number(event.detail.url.searchParams.get('page') || 1),
+            perPage: galleryPageSize(gallery, targetSize), scroll: changedSort,
+        });
     });
     document.addEventListener('media:uploaded', () => checkFeed(true));
-    window.setInterval(() => checkFeed(), 20000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) checkFeed(); });
+    window.setInterval(() => { if (!document.hidden) checkFeed(); }, 20000);
 }
 
 async function initGuest() {

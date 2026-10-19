@@ -7,7 +7,8 @@
     },
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "build:production": "vite build && node scripts/use-production-assets.mjs"
     },
     "devDependencies": {
         "laravel-vite-plugin": "^1.0.0",

@@ -70,4 +70,4 @@
         </div>
     </section>
 </div>
-@push('scripts')<script>window.demoMedia = @json($items);</script>@endpush
+@push('scripts')<script>window.demoMedia = @json($items); window.galleryPagination = @json($pagination); window.galleryVersion = @json($version);</script>@endpush

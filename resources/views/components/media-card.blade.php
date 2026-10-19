@@ -1,7 +1,7 @@
 @props(['item', 'hidden' => false, 'priority' => false])
 <article @if($hidden) hidden @endif class="media-card" data-media-card="{{ $item['id'] }}" data-delete-url="{{ route('media.destroy', ['media' => $item['id']]) }}">
     <button type="button" data-open-media="{{ $item['id'] }}" aria-label="View full {{ $item['type'] }} from {{ $item['date_display'] }} at {{ $item['time_display'] }}" class="media-card__image-wrap {{ $item['type'] === 'image' ? 'media-card__image-wrap--framed' : '' }}">@if($item['type'] === 'video')<video src="{{ $item['src'] }}#t=0.1" muted playsinline preload="metadata" aria-hidden="true"></video>@else
-        <span class="media-card__photo-box"><img src="{{ $item['src'] }}" alt="" width="{{ $item['width'] ?: 1066 }}" height="{{ $item['height'] ?: 1600 }}" loading="{{ $priority ? 'eager' : 'lazy' }}" @if($priority) fetchpriority="high" @endif decoding="async"></span>
+        <span class="media-card__photo-box"><img src="{{ $item['thumbnail'] ?? $item['src'] }}" alt="" width="{{ $item['width'] ?: 1066 }}" height="{{ $item['height'] ?: 1600 }}" loading="{{ $priority ? 'eager' : 'lazy' }}" @if($priority) fetchpriority="high" @endif decoding="async"></span>
         <img class="media-card__template" src="{{ asset('media/Pocket Size_no line.png') }}" alt="" width="1800" height="1200" decoding="async">
         @endif
         <span class="media-card__loading" data-card-loading hidden aria-hidden="true"><span class="mini-spinner"></span></span>

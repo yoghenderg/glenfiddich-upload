@@ -117,6 +117,12 @@ class UploadController extends Controller
                 throw $e;
             }
             $disk->deleteDirectory('uploads/'.$s->id);
+            // Preview failures must not invalidate a successfully stored original.
+            try {
+                \App\Support\MediaThumbnail::generate($media);
+            } catch (\Throwable $error) {
+                report($error);
+            }
 
             return response()->json($this->state($s));
         });

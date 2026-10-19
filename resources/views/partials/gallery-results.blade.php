@@ -6,16 +6,16 @@
         @elseif(count($items) === 0)
             <div class="state-card"><span class="state-card__icon"><x-icon name="image" :size="28"/></span><h2>No media yet</h2><p>Photos and videos will appear here.</p><a class="button button--dark" href="{{ route('upload') }}">Go to upload</a></div>
         @else
-            <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item" :hidden="$loop->index >= 16" :priority="$loop->index < 4"/>@endforeach</div>
+            <div class="media-grid" id="media-grid" data-count="{{ count($items) }}">@foreach($items as $item)<x-media-card :item="$item" :priority="$loop->index < 4"/>@endforeach</div>
         @endif
     </div>
     @if($state === 'ready')
     <nav class="pagination-bar" aria-label="Gallery pages">
-        <span id="gallery-page-summary" role="status" aria-live="polite"><span id="media-count">{{ count($items) }}</span> {{ count($items) === 1 ? 'item' : 'items' }}</span>
+        <span id="gallery-page-summary" role="status" aria-live="polite"><span id="media-count">{{ $pagination['total'] }}</span> {{ $pagination['total'] === 1 ? 'item' : 'items' }}</span>
         <div class="pagination-bar__controls" id="gallery-pagination">
-            <button type="button" class="pagination-button" id="gallery-previous" aria-label="Previous page" aria-controls="media-grid" disabled>Previous</button>
-            <span class="pagination-bar__current" id="gallery-page-number" role="status" aria-live="polite">1 / {{ max(1, (int) ceil(count($items) / 16)) }}</span>
-            <button type="button" class="pagination-button" id="gallery-next" aria-label="Next page" aria-controls="media-grid" @disabled(count($items) <= 16)>Next</button>
+            <button type="button" class="pagination-button" id="gallery-previous" aria-label="Previous page" aria-controls="media-grid" @disabled($pagination['page'] <= 1)>Previous</button>
+            <span class="pagination-bar__current" id="gallery-page-number" role="status" aria-live="polite">{{ $pagination['page'] }} / {{ $pagination['pages'] }}</span>
+            <button type="button" class="pagination-button" id="gallery-next" aria-label="Next page" aria-controls="media-grid" @disabled($pagination['page'] >= $pagination['pages'])>Next</button>
         </div>
     </nav>
     @endif

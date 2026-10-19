@@ -12,6 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        // Serial backfill handles large images that exceed the web memory budget.
+        $schedule->command('media:thumbnails')->everyFiveMinutes()->withoutOverlapping();
         $schedule->call(function (): void {
             \App\Models\UploadSession::whereNull('media_id')->where('updated_at', '<', now()->subDay())
                 ->pluck('id')->each(function ($id): void {
