@@ -13,7 +13,7 @@
 <body class="rayban-page @yield('body-class')">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
-    @if(auth()->check() && request()->routeIs('upload'))
+    @if(auth()->check() && request()->routeIs('upload', 'gallery'))
         <div class="staff-toolbar">
             <form action="{{ route('logout') }}" method="post">
                 @csrf

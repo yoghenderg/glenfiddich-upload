@@ -40,7 +40,8 @@ class UploadTest extends TestCase
         $media = Media::firstOrFail();
         $this->assertSame($bytes, Storage::disk('local')->get($media->path));
         $this->assertFalse(Storage::disk('local')->exists('uploads/'.$id.'/0'));
-        $this->getJson('/gallery/feed')->assertJsonCount(1, 'items')->assertJsonPath('items.0.id', $media->public_id);
+        $feed = $this->getJson('/gallery/feed')->assertJsonCount(1, 'items')->assertJsonPath('items.0.id', $media->public_id);
+        $this->assertStringContainsString('data-media-card="'.$media->public_id.'"', $feed->json('html'));
         $this->withoutExceptionHandling();
         $this->get('/gallery')->assertOk()->assertSee($media->public_id);
         $this->post('/logout');

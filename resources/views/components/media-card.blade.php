@@ -4,6 +4,7 @@
         <span class="media-card__photo-box"><img src="{{ $item['src'] }}" alt="" width="{{ $item['width'] ?: 1066 }}" height="{{ $item['height'] ?: 1600 }}" loading="{{ $priority ? 'eager' : 'lazy' }}" @if($priority) fetchpriority="high" @endif decoding="async"></span>
         <img class="media-card__template" src="{{ asset('media/Pocket Size_no line.png') }}" alt="" width="1800" height="1200" decoding="async">
         @endif
+        <span class="media-card__loading" data-card-loading hidden aria-hidden="true"><span class="mini-spinner"></span></span>
         @if($item['type'] === 'video')<span class="media-card__play"><x-icon name="video" :size="18"/></span>@endif</button>
     <span class="media-card__footer"><time class="media-card__timestamp" datetime="{{ $item['captured_at'] }}"><span class="media-card__date">{{ $item['date_display'] }}</span><span class="media-card__time">{{ $item['time_display'] }}</span></time></span>
     <div class="media-card__actions" aria-label="Media actions">

@@ -12,9 +12,9 @@ use Illuminate\View\View;
 
 final class DemoMediaController extends Controller
 {
-    public function upload(): View
+    public function upload(Request $request): View
     {
-        return view('pages.upload');
+        return $this->gallery($request);
     }
 
     public function gallery(Request $request): View
@@ -29,14 +29,25 @@ final class DemoMediaController extends Controller
             $sort = 'none';
         }
 
-        return view('pages.gallery', ['items' => $state === 'empty' ? [] : $this->items($sort), 'state' => $state, 'sort' => $sort]);
+        return view('pages.moments', [
+            'items' => $state === 'empty' ? [] : $this->items($sort),
+            'state' => $state,
+            'sort' => $sort,
+            'activeView' => $request->routeIs('upload') ? 'upload' : 'gallery',
+        ]);
     }
 
     public function feed(Request $request): JsonResponse
     {
         $sort = $request->query('sort', 'none');
 
-        return response()->json(['items' => $this->items(is_string($sort) ? $sort : 'none'), 'updated_at' => now()->toIso8601String()]);
+        $items = $this->items(is_string($sort) ? $sort : 'none');
+
+        return response()->json([
+            'items' => $items,
+            'html' => view('partials.gallery-results', ['items' => $items, 'state' => 'ready'])->render(),
+            'updated_at' => now()->toIso8601String(),
+        ]);
     }
 
     private function items(string $sort): array

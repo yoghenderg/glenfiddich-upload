@@ -1,11 +1,3 @@
-@extends('layouts.app')
-@section('title', 'Upload')
-@section('body-class', 'upload-page')
-@section('navigation')
-    <a class="nav-link is-active" href="{{ route('upload') }}" aria-current="page">Upload</a>
-    <a class="nav-link" href="{{ route('gallery') }}">Gallery</a>
-@endsection
-@section('content')
 <section class="upload-layout" aria-labelledby="upload-title">
     <div class="upload-panel card">
         <h1 id="upload-title">Share your photo</h1>
@@ -31,4 +23,3 @@
         </form>
     </div>
 </section>
-@endsection

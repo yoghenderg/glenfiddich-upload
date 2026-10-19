@@ -5,7 +5,9 @@ import '@fontsource/montserrat/latin-400.css';
 import '@fontsource/montserrat/latin-500.css';
 import '@fontsource/montserrat/latin-600.css';
 import '@fontsource/montserrat/latin-700.css';
-import { initPagination } from './gallery-pagination';
+import { initPagination, pageWindow } from './gallery-pagination';
+import { preloadGalleryImages } from './gallery-images';
+import { initWorkspace } from './workspace';
 import { ChunkedUpload } from './uploads/chunked-upload';
 import { httpTransport } from './uploads/transports';
 
@@ -91,6 +93,7 @@ function initUpload() {
             feedback.textContent = 'Upload complete. View it in the gallery.';
             label.textContent = 'Complete'; job = null;
             setBusy(false); button.disabled = true;
+            document.dispatchEvent(new Event('media:uploaded'));
         } catch (error) {
             setBusy(false);
             if (error.name === 'AbortError') {
@@ -123,9 +126,9 @@ function initGallery() {
             }
         });
     }
-    initPagination(gallery);
+    let disposePagination = initPagination(gallery);
     const viewer = $('#media-viewer'), mediaHost = $('#viewer-media'), feedback = $('#viewer-hint');
-    const media = window.demoMedia || [];
+    let media = window.demoMedia || [];
     const prepared = new WeakMap();
     const itemFor = card => media.find(item => item.id === card.dataset.mediaCard);
     const deleteModal = $('#delete-modal'), deleteConfirm = $('#delete-confirm'), deleteCancel = $('#delete-cancel'), deleteHint = $('#delete-hint');
@@ -166,7 +169,12 @@ function initGallery() {
                 headers: { Accept: 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').content },
             });
             if (!response.ok && response.status !== 404) throw new Error('Delete failed');
-            window.location.reload();
+            deleting = false;
+            closeDelete();
+            await checkFeed(true);
+            const heading = $('#gallery-title');
+            heading.setAttribute('tabindex', '-1');
+            heading.focus({ preventScroll: true });
         } catch {
             deleteHint.textContent = 'Unable to delete this item. Please try again.';
             deleteConfirm.textContent = 'Delete';
@@ -223,19 +231,6 @@ function initGallery() {
         state.photo.catch(() => { prepared.delete(card); });
         return state;
     };
-    // Prepare visible photos for the full view and downloads.
-    const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const item = itemFor(entry.target);
-            if (item) prepare(entry.target, item);
-            observer.unobserve(entry.target);
-        });
-    }, { root: $('[data-gallery-scroll]', gallery), rootMargin: '150px' }) : null;
-    gallery.querySelectorAll('[data-media-card]').forEach(card => {
-        if (observer) observer.observe(card);
-        else { const item = itemFor(card); if (item) prepare(card, item); }
-    });
     let previousFocus = null, viewRequest = 0;
     const close = () => { viewRequest++; viewer.hidden = true; mediaHost.replaceChildren(); document.body.classList.remove('viewer-open'); previousFocus?.focus(); };
     const open = async (item, trigger, card) => {
@@ -304,18 +299,81 @@ function initGallery() {
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
-    const checkFeed = async () => {
+    let feedRequest = null;
+    let requestedSort = null;
+    let loadedSort = new URL(gallery.dataset.feedUrl).searchParams.get('sort') || 'none';
+    let lastChecked = Date.now();
+    const galleryLoading = $('[data-gallery-loading]', gallery);
+    const checkFeed = async (force = false) => {
+        if (document.body.classList.contains('viewer-open')) return;
+        const feedUrl = new URL(gallery.dataset.feedUrl);
+        const sort = feedUrl.searchParams.get('sort') || 'none';
+        if (!force && feedRequest && requestedSort === sort) return;
+        feedRequest?.abort();
+        feedRequest = null;
+        galleryLoading.hidden = true;
+        if (!force && sort === loadedSort && gallery.dataset.galleryState === 'ready' && Date.now() - lastChecked < 15000) return;
+        const controller = new AbortController();
+        feedRequest = controller;
+        requestedSort = sort;
+        galleryLoading.hidden = false;
+        const hint = $('[data-gallery-feedback]', gallery);
         try {
-            const response = await fetch(gallery.dataset.feedUrl, { cache: 'no-store', headers: { Accept: 'application/json' } });
+            const response = await fetch(feedUrl, { signal: controller.signal, cache: 'no-store', headers: { Accept: 'application/json' } });
             if (!response.ok) throw new Error('Feed unavailable');
             const data = await response.json();
-            if (!deletion && data.items.map((item) => item.id).join() !== media.map((item) => item.id).join()) window.location.reload();
-        } catch {
-            // Retry on the next polling interval if the feed is unavailable.
+            if (controller.signal.aborted || document.body.classList.contains('viewer-open')) return;
+            if (sort !== loadedSort || gallery.dataset.galleryState !== 'ready' || JSON.stringify(data.items) !== JSON.stringify(media)) {
+                // Show the new cards immediately; each preview has its own loader.
+                const incoming = document.createElement('div');
+                incoming.innerHTML = data.html;
+                const cards = [...incoming.querySelectorAll('[data-media-card]')];
+                const grid = $('#media-grid', gallery);
+                const size = grid ? parseInt(getComputedStyle(grid).getPropertyValue('--gallery-page-size'), 10) || 16 : 16;
+                const page = pageWindow(cards.length, size, sort !== loadedSort ? 1 : gallery.dataset.page || 1);
+                cards.forEach((card, index) => { card.hidden = index < page.start || index >= page.end; });
+                void preloadGalleryImages(incoming);
+                if (controller.signal.aborted || document.body.classList.contains('viewer-open')) return;
+                const scrollTop = $('[data-gallery-scroll]', gallery)?.scrollTop || 0;
+                disposePagination?.();
+                media = data.items;
+                $('[data-gallery-results]', gallery).replaceChildren(...incoming.childNodes);
+                disposePagination = initPagination(gallery, { reset: sort !== loadedSort });
+                if (sort === loadedSort) $('[data-gallery-scroll]', gallery)?.scrollTo({ top: scrollTop });
+                loadedSort = sort;
+                gallery.dataset.galleryState = 'ready';
+            }
+            lastChecked = Date.now();
+            hint.textContent = '';
+        } catch (error) {
+            if (error.name !== 'AbortError') hint.textContent = 'Could not refresh the gallery. Try again shortly.';
+        } finally {
+            if (feedRequest === controller) {
+                feedRequest = null;
+                galleryLoading.hidden = true;
+            }
         }
     };
-    $('#retry-gallery')?.addEventListener('click', () => { window.location.href = gallery.dataset.feedUrl.replace('/feed', ''); });
-    if (gallery.dataset.galleryState === 'ready') window.setInterval(checkFeed, 20000);
+    gallery.addEventListener('click', event => {
+        if (event.target.closest('#retry-gallery')) checkFeed(true);
+    });
+    document.addEventListener('workspace:view', event => {
+        if (event.detail.view !== 'gallery') return;
+        const sort = event.detail.url.searchParams.get('sort') || 'none';
+        const feedUrl = new URL(gallery.dataset.feedUrl);
+        feedUrl.searchParams.set('sort', sort);
+        gallery.dataset.feedUrl = feedUrl.href;
+        gallery.dispatchEvent(new Event('gallery:paginate'));
+        gallery.querySelectorAll('.gallery-sort__menu a').forEach(link => {
+            const selected = (new URL(link.href).searchParams.get('sort') || 'none') === sort;
+            $('[data-sort-check]', link).hidden = !selected;
+            if (selected) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
+        });
+        checkFeed();
+    });
+    document.addEventListener('media:uploaded', () => checkFeed(true));
+    window.setInterval(() => checkFeed(), 20000);
 }
 
 async function initGuest() {
@@ -336,4 +394,4 @@ async function initGuest() {
     } catch { hint.textContent = 'Unable to prepare your photo. Please reload this page to try again.'; }
 }
 
-initUpload(); initGallery(); initGuest();
+initWorkspace(); initUpload(); initGallery(); initGuest();

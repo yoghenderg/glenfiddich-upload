@@ -54,6 +54,30 @@ button { color: inherit; }
   transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 .nav-link.is-active { border-color: #BC0001; background: #BC0001; color: #fff; box-shadow: 0 3px 10px rgba(188, 0, 1, .2); }
+.workspace-page .site-nav {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.workspace-page .site-nav::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 11px) / 2);
+  border-radius: 999px;
+  background: #BC0001;
+  box-shadow: 0 3px 10px rgba(188, 0, 1, .2);
+  transition: transform .26s cubic-bezier(.2,.75,.3,1);
+  pointer-events: none;
+}
+.workspace-page.gallery-page .site-nav::before { transform: translateX(calc(100% + 3px)); }
+.workspace-page .site-nav .nav-link { position: relative; z-index: 1; touch-action: manipulation; transition: color .14s ease; }
+.workspace-page .site-nav .nav-link.is-active,
+.workspace-page .site-nav .nav-link:hover { border-color: transparent; background: transparent; box-shadow: none; }
 @media (hover: hover) and (pointer: fine) {
   .brand:hover { opacity: .9; transform: translateY(-1px); }
   .nav-link:hover { color: #8f0000; background: #fff0f0; }

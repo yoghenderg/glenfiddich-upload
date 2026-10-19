@@ -1,16 +1,54 @@
 @keyframes appear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mini-spin { to { transform: rotate(360deg); } }
 @keyframes dialog-in { from { opacity: 0; transform: translateY(9px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes dropdown-in { from { opacity: 0; transform: translateY(-6px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes workspace-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes gallery-card-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes header-in-a { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes header-in-b { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes gallery-pagination-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes live-pulse { 50% { box-shadow: 0 0 0 5px rgba(54,173,112,.1); } }
 .upload-panel, .guest-card { animation: appear .45s cubic-bezier(.2,.75,.3,1) both; }
 .gallery-heading { animation: appear .38s ease both; }
+.workspace-panel:not([hidden]) > .upload-layout,
+.workspace-panel:not([hidden]) > .gallery-content { animation: none; }
+.workspace-page .upload-panel, .workspace-page .gallery-heading { animation: none; }
+.workspace-page .upload-panel > h1,
+.workspace-page .upload-subtitle,
+.workspace-page .drop-zone,
+.workspace-page .upload-controls,
+.workspace-page .upload-submit { animation: workspace-in .2s cubic-bezier(.2,.75,.3,1) backwards; }
+.workspace-page .upload-subtitle { animation-delay: 25ms; }
+.workspace-page .drop-zone { animation-delay: 50ms; }
+.workspace-page .upload-controls { animation-delay: 75ms; }
+.workspace-page .upload-submit { animation-delay: 100ms; }
 .gallery-sort[open] .gallery-sort__menu { transform-origin: top right; animation: dropdown-in .18s cubic-bezier(.2,.75,.3,1) both; }
 .media-card { animation: fade-in .42s ease both; }
 .media-card:nth-child(2) { animation-delay: .07s; }
 .media-card:nth-child(3) { animation-delay: .14s; }
 .pagination-bar { animation: fade-in .5s .2s ease both; }
+.workspace-page .brand,
+.workspace-page .site-nav,
+.workspace-page .gallery-heading__eyebrow,
+.workspace-page .gallery-heading__title-row,
+.workspace-page .gallery-sort { animation: header-in-a .42s cubic-bezier(.2,.75,.3,1) backwards; }
+.workspace-page[data-workspace-entry='b'] .brand,
+.workspace-page[data-workspace-entry='b'] .site-nav,
+.workspace-page[data-workspace-entry='b'] .gallery-heading__eyebrow,
+.workspace-page[data-workspace-entry='b'] .gallery-heading__title-row,
+.workspace-page[data-workspace-entry='b'] .gallery-sort { animation-name: header-in-b; }
+.workspace-page .site-nav { animation-delay: 60ms; }
+.workspace-page .gallery-heading__eyebrow { animation-delay: 120ms; }
+.workspace-page .gallery-heading__title-row { animation-delay: 180ms; }
+.workspace-page .gallery-sort { animation-delay: 240ms; }
+.workspace-page .gallery-content .state-card,
+.workspace-page .gallery-content .skeleton-card { animation: gallery-card-in .42s cubic-bezier(.2,.75,.3,1) backwards; }
+.workspace-page .gallery-content .state-card,
+.workspace-page .gallery-content .skeleton-card { animation-delay: 180ms; }
+.workspace-page .media-card { animation: gallery-card-in .42s cubic-bezier(.2,.75,.3,1) var(--card-enter-delay, 90ms) backwards; }
+.workspace-page .pagination-bar { animation: gallery-pagination-in .42s 300ms cubic-bezier(.2,.75,.3,1) backwards; }
 .viewer:not([hidden]) .viewer__backdrop { animation: fade-in .18s ease both; }
 .viewer:not([hidden]) .viewer__dialog { animation: dialog-in .22s cubic-bezier(.2,.75,.3,1) both; }
 .live-status[data-status='live'] .live-status__dot { animation: live-pulse 2.6s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; } }
