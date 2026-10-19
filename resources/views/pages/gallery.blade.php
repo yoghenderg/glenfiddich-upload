@@ -81,5 +81,18 @@
         <a class="button button--dark" id="share-link" target="_blank" rel="noopener">Open download page</a>
     </section>
 </div>
+<div class="viewer" id="delete-modal" hidden>
+    <div class="viewer__backdrop" data-close-delete></div>
+    <section class="share-dialog delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description delete-filename">
+        <h2 id="delete-title">Are you sure?</h2>
+        <p id="delete-description">This will permanently delete this photo or video. This cannot be undone.</p>
+        <p id="delete-filename"></p>
+        <p id="delete-hint" role="status" aria-live="polite"></p>
+        <div class="delete-dialog__actions">
+            <button class="button button--soft" type="button" data-close-delete id="delete-cancel">Cancel</button>
+            <button class="button button--dark" type="button" id="delete-confirm">Delete</button>
+        </div>
+    </section>
+</div>
 @push('scripts')<script>window.demoMedia = @json($items);</script>@endpush
 @endsection

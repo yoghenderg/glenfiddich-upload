@@ -29,6 +29,7 @@ Route::middleware('event.staff')->group(function (): void {
     Route::get('/upload', [DemoMediaController::class, 'upload'])->name('upload');
     Route::get('/gallery', [DemoMediaController::class, 'gallery'])->name('gallery');
     Route::get('/gallery/feed', [DemoMediaController::class, 'feed'])->name('gallery.feed');
+    Route::delete('/media/{media}', [DemoMediaController::class, 'destroy'])->name('media.destroy');
 });
 Route::get('/media/{id}', [DemoMediaController::class, 'guest'])->name('media.guest');
 

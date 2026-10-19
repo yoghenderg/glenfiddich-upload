@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Media;
+use App\Models\UploadSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 final class DemoMediaController extends Controller
@@ -71,5 +73,18 @@ final class DemoMediaController extends Controller
         return Storage::disk($media->disk)->download($media->path, $media->original_filename, [
             'Content-Type' => $media->mime_type, 'X-Content-Type-Options' => 'nosniff',
         ]);
+    }
+
+    public function destroy(Media $media)
+    {
+        DB::transaction(function () use ($media): void {
+            // Keep completed upload keys cancelled so retries cannot recreate deleted media.
+            UploadSession::where('media_id', $media->id)->update(['media_id' => null, 'cancelled' => true]);
+            $media->delete();
+            $paths = array_values(array_unique(array_filter([$media->path, $media->poster_path])));
+            abort_unless(Storage::disk($media->disk)->delete($paths), 500, 'Could not delete the media file.');
+        });
+
+        return response()->noContent();
     }
 }

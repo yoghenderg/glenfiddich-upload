@@ -83,6 +83,20 @@
 .share-dialog #share-hint { margin-bottom: 14px; }
 .share-dialog #share-hint:empty { display: none; }
 .share-dialog .button { margin-top: 8px; }
+.delete-dialog { padding-top: 32px; }
+.delete-dialog #delete-filename { margin-top: 12px; overflow-wrap: anywhere; font-weight: 600; }
+.delete-dialog #delete-hint { margin-top: 14px; color: #a60000; }
+.delete-dialog #delete-hint:empty { display: none; }
+.delete-dialog__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.delete-dialog__actions button { min-height: 44px; }
+.delete-dialog__actions #delete-cancel { border-color: #d6cdcd; background: #fff; color: #493e3e; box-shadow: none; }
+.delete-dialog__actions #delete-confirm { border-color: #BC0001; background: #BC0001; color: #fff; box-shadow: 0 4px 12px rgba(188, 0, 1, .18); }
+.delete-dialog__actions button:focus-visible { outline: 3px solid #BC0001; outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  .delete-dialog__actions #delete-cancel:hover:not(:disabled) { border-color: #b2a3a3; background: #f5f2f2; }
+  .delete-dialog__actions #delete-confirm:hover:not(:disabled) { border-color: #990001; background: #990001; }
+}
+.delete-dialog__actions button:disabled { opacity: .5; cursor: wait; }
 
 .viewer__dialog.viewer__dialog--full { width: min(96vw, 1500px); height: 90dvh; min-height: 0; display: flex; flex-direction: column; background: #171111; }
 .viewer__dialog--full .viewer__media { flex: 1; width: 100%; min-height: 0; height: auto; margin: 0; border-radius: 0; background: transparent; }

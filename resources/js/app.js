@@ -116,6 +116,53 @@ function initGallery() {
     const media = window.demoMedia || [];
     const prepared = new WeakMap();
     const itemFor = card => media.find(item => item.id === card.dataset.mediaCard);
+    const deleteModal = $('#delete-modal'), deleteConfirm = $('#delete-confirm'), deleteCancel = $('#delete-cancel'), deleteHint = $('#delete-hint');
+    let deletion = null, deleting = false;
+    const closeDelete = () => {
+        if (deleting) return;
+        deleteModal.hidden = true;
+        document.body.classList.remove('viewer-open');
+        deletion?.trigger.focus();
+        deletion = null;
+    };
+    const openDelete = (item, card, trigger) => {
+        deletion = { item, card, trigger };
+        $('#delete-filename').textContent = item.filename;
+        deleteHint.textContent = '';
+        deleteConfirm.textContent = 'Delete';
+        deleteModal.hidden = false;
+        document.body.classList.add('viewer-open');
+        deleteCancel.focus();
+    };
+    deleteModal.addEventListener('click', event => { if (event.target.closest('[data-close-delete]')) closeDelete(); });
+    deleteModal.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeDelete();
+        if (event.key !== 'Tab') return;
+        if (deleting) { event.preventDefault(); return; }
+        if (event.shiftKey && document.activeElement === deleteCancel) { event.preventDefault(); deleteConfirm.focus(); }
+        else if (!event.shiftKey && document.activeElement === deleteConfirm) { event.preventDefault(); deleteCancel.focus(); }
+    });
+    deleteConfirm.addEventListener('click', async () => {
+        if (!deletion || deleting) return;
+        deleting = true;
+        deleteConfirm.disabled = deleteCancel.disabled = true;
+        deleteConfirm.textContent = 'Deleting...';
+        deleteHint.textContent = '';
+        try {
+            const response = await fetch(deletion.card.dataset.deleteUrl, {
+                method: 'DELETE',
+                headers: { Accept: 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').content },
+            });
+            if (!response.ok && response.status !== 404) throw new Error('Delete failed');
+            window.location.reload();
+        } catch {
+            deleteHint.textContent = 'Unable to delete this item. Please try again.';
+            deleteConfirm.textContent = 'Delete';
+        } finally {
+            deleting = false;
+            deleteConfirm.disabled = deleteCancel.disabled = false;
+        }
+    });
     const shareModal = $('#share-modal'), qrHost = $('#share-qr'), shareHint = $('#share-hint');
     let shareTrigger = null, shareRequest = 0, qrCodeModule;
     const closeShare = () => {
@@ -230,6 +277,7 @@ function initGallery() {
                 openShare(item, action);
             } else if (action.dataset.cardAction === 'download') downloadPhoto(item, card, action, hint);
             else if (action.dataset.cardAction === 'print' && item.type === 'image') printPhoto(item, hint);
+            else if (action.dataset.cardAction === 'delete') openDelete(item, card, action);
             return;
         }
         const trigger = event.target.closest('[data-open-media]');
@@ -251,7 +299,7 @@ function initGallery() {
             if (!response.ok) throw new Error('Feed unavailable');
             const data = await response.json();
             status.dataset.status = 'live'; label.textContent = 'LIVE';
-            if (data.items.map((item) => item.id).join() !== media.map((item) => item.id).join()) window.location.reload();
+            if (!deletion && data.items.map((item) => item.id).join() !== media.map((item) => item.id).join()) window.location.reload();
         } catch { status.dataset.status = 'reconnecting'; label.textContent = 'RECONNECTING'; }
     };
     $('#retry-gallery')?.addEventListener('click', () => { window.location.href = gallery.dataset.feedUrl.replace('/feed', ''); });
