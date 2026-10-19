@@ -8,7 +8,7 @@ export function initPagination(gallery) {
     const grid = gallery.querySelector('#media-grid');
     const controls = gallery.querySelector('#gallery-pagination');
     if (!grid || !controls) return;
-    const cards = [...grid.querySelectorAll('[data-open-media]')];
+    const cards = [...grid.querySelectorAll('[data-media-card]')];
     const previous = gallery.querySelector('#gallery-previous');
     const next = gallery.querySelector('#gallery-next');
     const summary = gallery.querySelector('#gallery-page-summary');

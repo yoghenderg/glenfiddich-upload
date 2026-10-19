@@ -1,10 +1,12 @@
 const MAX_SHARE_BYTES = 32 * 1024 * 1024;
 
 // Prepare before a tap. Safari requires share() to run during user activation.
-export async function prepareShareFile(item, signal) {
+export async function prepareShareFile(item, signal, framedPhoto) {
     if (!navigator.share || !navigator.canShare) return null;
     try {
-        const response = await fetch(item.src, { signal });
+        const src = item.type === 'image' ? await framedPhoto : item.src;
+        if (!src || signal?.aborted) return null;
+        const response = await fetch(src, { signal });
         if (!response.ok) return null;
         const expected = Number(response.headers.get('content-length'));
         if (expected > MAX_SHARE_BYTES) { await response.body?.cancel(); return null; }
@@ -19,7 +21,8 @@ export async function prepareShareFile(item, signal) {
             if (total > MAX_SHARE_BYTES) { await reader.cancel(); return null; }
             parts.push(value);
         }
-        const file = new File(parts, item.filename, { type: response.headers.get('content-type')?.split(';')[0] || (item.type === 'video' ? 'video/mp4' : 'image/jpeg') });
+        const filename = item.type === 'image' ? `${(item.filename || 'photo').replace(/\.[^.]+$/, '')}-framed.png` : item.filename;
+        const file = new File(parts, filename, { type: response.headers.get('content-type')?.split(';')[0] || (item.type === 'video' ? 'video/mp4' : 'image/png') });
         return navigator.canShare({ files: [file] }) ? file : null;
     } catch { return null; }
 }

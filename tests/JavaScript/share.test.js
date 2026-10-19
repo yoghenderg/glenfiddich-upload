@@ -1,6 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shareMoment } from '../../resources/js/share.js';
+import { prepareShareFile, shareMoment } from '../../resources/js/share.js';
+
+test('prepares the framed PNG for sharing instead of the original photo', async () => {
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { canShare: () => true, share: () => Promise.resolve() } });
+    const framed = 'data:image/png;base64,aW1hZ2U=';
+    const file = await prepareShareFile({ type: 'image', src: '/original.jpg', filename: 'moment.jpg' }, new AbortController().signal, Promise.resolve(framed));
+    assert.equal(file.name, 'moment-framed.png');
+    assert.equal(file.type, 'image/png');
+    assert.equal(await file.text(), 'image');
+});
+
+test('does not prepare the original photo when the framed image fails', async () => {
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { canShare: () => true, share: () => Promise.resolve() } });
+    const file = await prepareShareFile({ type: 'image', src: '/original.jpg', filename: 'moment.jpg' }, new AbortController().signal, Promise.reject(new Error('Composition failed')));
+    assert.equal(file, null);
+});
 
 test('native share is called synchronously on tap with the already prepared file', async () => {
     let shared;

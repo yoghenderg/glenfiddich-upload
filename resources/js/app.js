@@ -1,4 +1,4 @@
-import { printPhoto } from './print';
+import { composePrintPhoto, printPhoto } from './print';
 import '@fortawesome/fontawesome-free/css/fontawesome.css';
 import '@fortawesome/fontawesome-free/css/solid.css';
 import '@fontsource/montserrat/latin-400.css';
@@ -8,17 +8,8 @@ import '@fontsource/montserrat/latin-700.css';
 import { initPagination } from './gallery-pagination';
 import { ChunkedUpload } from './uploads/chunked-upload';
 import { httpTransport } from './uploads/transports';
-import { prepareShareFile, shareMoment } from './share';
 
 const $ = (selector, root = document) => root.querySelector(selector);
-let qrCodeModule;
-
-async function drawQr(canvas, value) {
-    qrCodeModule ||= import('qrcode');
-    const { default: QRCode } = await qrCodeModule;
-    await QRCode.toCanvas(canvas, value, { width: 160, margin: 1, color: { dark: '#111111', light: '#ffffff' } });
-}
-
 function initUpload() {
     const form = $('#upload-form');
     if (!form) return;
@@ -123,48 +114,136 @@ function initGallery() {
     initPagination(gallery);
     const viewer = $('#media-viewer'), mediaHost = $('#viewer-media'), feedback = $('#viewer-hint');
     const media = window.demoMedia || [];
-    let previousFocus = null, current = null, currentUrl = '', shareFile = null, shareController = null;
-    const close = () => { shareController?.abort(); shareFile = null; current = null; viewer.hidden = true; mediaHost.replaceChildren(); document.body.classList.remove('viewer-open'); previousFocus?.focus(); };
-    const open = async (item, trigger) => {
-        current = item;
-        shareController?.abort(); shareFile = null; shareController = new AbortController();
-        const request = shareController;
-        prepareShareFile(item, request.signal).then(file => { if (!request.signal.aborted && current === item) shareFile = file; });
+    const prepared = new WeakMap();
+    const itemFor = card => media.find(item => item.id === card.dataset.mediaCard);
+    const shareModal = $('#share-modal'), qrHost = $('#share-qr'), shareHint = $('#share-hint');
+    let shareTrigger = null, shareRequest = 0, qrCodeModule;
+    const closeShare = () => {
+        shareRequest++;
+        shareModal.hidden = true;
+        qrHost.replaceChildren();
+        document.body.classList.remove('viewer-open');
+        shareTrigger?.focus();
+    };
+    const openShare = async (item, trigger) => {
+        const request = ++shareRequest;
+        shareTrigger = trigger;
+        const url = gallery.dataset.guestBase + '/' + encodeURIComponent(item.id);
+        $('#share-link').href = url;
+        qrHost.replaceChildren();
+        shareHint.textContent = 'Preparing QR code...';
+        shareModal.hidden = false;
+        document.body.classList.add('viewer-open');
+        $('[data-share-close-button]', shareModal).focus();
+        try {
+            qrCodeModule ||= import('qrcode');
+            const { default: QRCode } = await qrCodeModule;
+            const canvas = document.createElement('canvas');
+            canvas.setAttribute('role', 'img');
+            canvas.setAttribute('aria-label', 'Scan to open and download this moment');
+            await QRCode.toCanvas(canvas, url, { width: 320, margin: 4, errorCorrectionLevel: 'M', color: { dark: '#111111', light: '#ffffff' } });
+            if (request !== shareRequest) return;
+            qrHost.append(canvas);
+            shareHint.textContent = '';
+        } catch {
+            if (request === shareRequest) shareHint.textContent = 'QR code unavailable. Use the link below or reopen Share to try again.';
+        }
+    };
+    shareModal.addEventListener('click', event => { if (event.target.closest('[data-close-share]')) closeShare(); });
+    shareModal.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeShare();
+        if (event.key !== 'Tab') return;
+        const first = $('[data-share-close-button]', shareModal), last = $('#share-link');
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    const prepare = (card, item) => {
+        if (prepared.has(card)) return prepared.get(card);
+        const state = { photo: item.type === 'image' ? composePrintPhoto(item.src) : Promise.resolve(null) };
+        prepared.set(card, state);
+        state.photo.catch(() => { prepared.delete(card); });
+        return state;
+    };
+    // Prepare visible photos for the full view and downloads.
+    const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const item = itemFor(entry.target);
+            if (item) prepare(entry.target, item);
+            observer.unobserve(entry.target);
+        });
+    }, { root: $('[data-gallery-scroll]', gallery), rootMargin: '150px' }) : null;
+    gallery.querySelectorAll('[data-media-card]').forEach(card => {
+        if (observer) observer.observe(card);
+        else { const item = itemFor(card); if (item) prepare(card, item); }
+    });
+    let previousFocus = null, viewRequest = 0;
+    const close = () => { viewRequest++; viewer.hidden = true; mediaHost.replaceChildren(); document.body.classList.remove('viewer-open'); previousFocus?.focus(); };
+    const open = async (item, trigger, card) => {
+        const request = ++viewRequest;
         previousFocus = trigger;
         mediaHost.replaceChildren();
         const element = document.createElement(item.type === 'video' ? 'video' : 'img');
         element.className = 'media-display';
-        element.src = item.src;
-        if (item.type === 'video') { element.controls = true; element.playsInline = true; element.poster = item.poster; }
-        else element.alt = item.alt;
+        if (item.type === 'video') { element.src = item.src; element.controls = true; element.playsInline = true; element.poster = item.poster; }
+        else { element.alt = (item.alt || 'Event photo') + ' in the pocket-size frame'; element.hidden = true; }
         mediaHost.append(element);
-        $('#viewer-date').textContent = item.date_display;
-        $('#viewer-time').textContent = item.time_display;
-        $('#viewer-time').dateTime = item.captured_at;
-        currentUrl = `${gallery.dataset.guestBase}/${encodeURIComponent(item.id)}`;
-        const download = $('#viewer-download'); download.href = item.download || item.src; download.download = item.filename;
-        $('#viewer-print').disabled = item.type !== 'image';
-        feedback.textContent = '';
-        try { await drawQr($('#viewer-qr'), currentUrl); }
-        catch { feedback.textContent = 'QR code unavailable. Use Share instead.'; }
+        feedback.textContent = item.type === 'image' ? 'Preparing preview...' : '';
         viewer.hidden = false;
         document.body.classList.add('viewer-open');
         $('.viewer__close', viewer).focus();
+        if (item.type !== 'image') return;
+        try {
+            const src = await prepare(card, item).photo;
+            if (request !== viewRequest) return;
+            element.src = src;
+            element.hidden = false;
+            feedback.textContent = '';
+        } catch {
+            if (request === viewRequest) feedback.textContent = 'Unable to prepare the preview. Please reopen the photo to try again.';
+        }
     };
-    gallery.addEventListener('click', (event) => {
-        const card = event.target.closest('[data-open-media]');
-        if (card) { const item = media.find((entry) => entry.id === card.dataset.openMedia); if (item) open(item, card); }
+    const downloadPhoto = async (item, card, button, hint) => {
+        button.disabled = true;
+        hint.textContent = 'Preparing download...';
+        try {
+            const link = document.createElement('a');
+            link.href = item.type === 'image' ? await prepare(card, item).photo : (item.download || item.src);
+            link.download = item.type === 'image' ? (item.filename || 'photo').replace(/\.[^.]+$/, '') + '-framed.png' : item.filename;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            hint.textContent = '';
+        } catch { hint.textContent = 'Unable to prepare the download. Please try again.'; }
+        finally { button.disabled = false; }
+    };
+    gallery.addEventListener('click', event => {
+        const card = event.target.closest('[data-media-card]');
+        if (!card) return;
+        const item = itemFor(card);
+        if (!item) return;
+        const action = event.target.closest('[data-card-action]');
+        const hint = $('[data-card-hint]', card);
+        if (action) {
+            hint.textContent = '';
+            if (action.dataset.cardAction === 'share') {
+                openShare(item, action);
+            } else if (action.dataset.cardAction === 'download') downloadPhoto(item, card, action, hint);
+            else if (action.dataset.cardAction === 'print' && item.type === 'image') printPhoto(item, hint);
+            return;
+        }
+        const trigger = event.target.closest('[data-open-media]');
+        if (trigger) open(item, trigger, card);
     });
-    viewer.addEventListener('click', (event) => { if (event.target.closest('[data-close-viewer]')) close(); });
-    viewer.addEventListener('keydown', (event) => {
+    viewer.addEventListener('click', event => { if (event.target.closest('[data-close-viewer]')) close(); });
+    viewer.addEventListener('keydown', event => {
         if (event.key === 'Escape') close();
         if (event.key !== 'Tab') return;
-        const focusable = [...viewer.querySelectorAll('button, a[href]')], first = focusable[0], last = focusable[focusable.length - 1];
+        const focusable = [...viewer.querySelectorAll('button:not(:disabled), a[href], video[controls]')];
+        const first = focusable[0], last = focusable[focusable.length - 1];
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
-    $('#viewer-print').addEventListener('click', () => current?.type === 'image' && printPhoto(current, feedback));
-    $('#viewer-share').addEventListener('click', () => current && shareMoment(current, currentUrl, feedback, shareFile));
     const status = $('#live-status'), label = $('#live-label');
     const checkFeed = async () => {
         try {
@@ -179,4 +258,22 @@ function initGallery() {
     if (status.dataset.status === 'live') window.setInterval(checkFeed, 20000);
 }
 
-initUpload(); initGallery();
+async function initGuest() {
+    const guest = $('[data-framed-guest]');
+    if (!guest) return;
+    const photo = $('.media-display', guest), download = $('.guest-download', guest), hint = $('[data-guest-hint]', guest);
+    photo.hidden = true;
+    try {
+        const src = await composePrintPhoto(guest.dataset.src);
+        photo.src = src;
+        photo.width = 1800;
+        photo.height = 1200;
+        photo.hidden = false;
+        download.href = src;
+        download.download = (guest.dataset.filename || 'photo').replace(/\.[^.]+$/, '') + '-framed.png';
+        download.removeAttribute('aria-disabled');
+        hint.textContent = '';
+    } catch { hint.textContent = 'Unable to prepare your photo. Please reload this page to try again.'; }
+}
+
+initUpload(); initGallery(); initGuest();

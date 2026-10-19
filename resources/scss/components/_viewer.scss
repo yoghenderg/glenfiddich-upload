@@ -75,6 +75,22 @@
 }
 
 .viewer__hint:empty { display: none; }
+.share-dialog { position: relative; width: min(100%, 440px); max-height: 92dvh; overflow-y: auto; padding: 68px 28px 28px; border-radius: 20px; background: #fff; color: #241d1d; text-align: center; box-shadow: 0 30px 90px rgba(43, 0, 0, .3); }
+.share-dialog h2 { margin-bottom: 10px; font-size: 1.5rem; }
+.share-dialog p { font-size: .85rem; color: #716869; }
+.share-dialog__qr { margin: 20px auto; width: min(100%, 320px); min-height: 180px; }
+.share-dialog__qr canvas { display: block; width: 100% !important; height: auto !important; }
+.share-dialog #share-hint { margin-bottom: 14px; }
+.share-dialog #share-hint:empty { display: none; }
+.share-dialog .button { margin-top: 8px; }
+
+.viewer__dialog.viewer__dialog--full { width: min(96vw, 1500px); height: 90dvh; min-height: 0; display: flex; flex-direction: column; background: #171111; }
+.viewer__dialog--full .viewer__media { flex: 1; width: 100%; min-height: 0; height: auto; margin: 0; border-radius: 0; background: transparent; }
+.viewer__dialog--full .viewer__hint { flex: 0 0 auto; width: 100%; padding: 12px; margin: 0; }
+.viewer__dialog--full .viewer__close { top: 12px; right: 12px; }
+@media (max-width: 600px) {
+  .viewer__dialog.viewer__dialog--full { width: 100%; height: 100dvh; padding-top: max(56px, env(safe-area-inset-top)); }
+}
 
 // Keep the three touch targets balanced at every viewer breakpoint.
 .viewer__actions { display: flex; justify-content: center; align-items: center; gap: 16px; }

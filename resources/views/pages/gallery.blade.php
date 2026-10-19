@@ -64,20 +64,21 @@
 </section>
 <div class="viewer" id="media-viewer" hidden>
     <div class="viewer__backdrop" data-close-viewer></div>
-    <section class="viewer__dialog" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
+    <section class="viewer__dialog viewer__dialog--full" role="dialog" aria-modal="true" aria-label="Full media view">
         <button class="viewer__close icon-button" type="button" data-close-viewer aria-label="Close media viewer"><x-icon name="close" :size="18"/></button>
         <div class="viewer__media" id="viewer-media"></div>
-        <aside class="viewer__sidebar">
-            <img class="viewer__brand" src="{{ asset('media/partner-logo.png') }}" alt="Ray-Ban" width="2048" height="1180">
-            <h2 id="viewer-title" class="viewer__timestamp"><span id="viewer-date"></span><time id="viewer-time"></time></h2>
-            <div class="viewer__qr-area"><p class="viewer__qr-label">SCAN TO DOWNLOAD</p><div class="qr-frame"><canvas id="viewer-qr" width="160" height="160" aria-label="QR code for this moment"></canvas></div></div>
-            <div class="viewer__actions" aria-label="Photo actions">
-                <a id="viewer-download" class="button button--soft" download aria-label="Download photo" title="Download"><x-icon name="download" :size="21"/></a>
-                <button type="button" id="viewer-share" class="button button--soft" aria-label="Share / AirDrop" title="Share / AirDrop"><x-icon name="airdrop" :size="23"/></button>
-                <button type="button" id="viewer-print" class="button button--soft" aria-label="Print photo at 4 by 6 inches" title="Print 4R photo"><x-icon name="print" :size="21"/></button>
-            </div>
-            <p class="viewer__hint" id="viewer-hint" role="status" aria-live="polite"></p>
-        </aside>
+        <p class="viewer__hint" id="viewer-hint" role="status" aria-live="polite"></p>
+    </section>
+</div>
+<div class="viewer" id="share-modal" hidden>
+    <div class="viewer__backdrop" data-close-share></div>
+    <section class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-title" aria-describedby="share-description">
+        <button class="viewer__close icon-button" type="button" data-close-share data-share-close-button aria-label="Close share dialog"><x-icon name="close" :size="18"/></button>
+        <h2 id="share-title">Scan to download</h2>
+        <p id="share-description">Scan this QR code with your phone to open your moment.</p>
+        <div class="share-dialog__qr" id="share-qr"></div>
+        <p id="share-hint" role="status" aria-live="polite"></p>
+        <a class="button button--dark" id="share-link" target="_blank" rel="noopener">Open download page</a>
     </section>
 </div>
 @push('scripts')<script>window.demoMedia = @json($items);</script>@endpush

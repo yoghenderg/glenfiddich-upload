@@ -70,6 +70,11 @@
   letter-spacing: .01em;
 }
 
+[data-framed-guest] .media-display { height: auto; }
+[data-framed-guest] .guest-download[aria-disabled='true'] { opacity: .5; pointer-events: none; }
+[data-guest-hint] { margin-top: 12px; text-align: center; font-size: .8rem; }
+[data-guest-hint]:empty { display: none; }
+
 @media (max-width: 380px) {
   .guest-page .site-header { padding-top: max(14px, env(safe-area-inset-top)); }
   .guest-page .brand { width: clamp(225px, 67vw, 255px); }
