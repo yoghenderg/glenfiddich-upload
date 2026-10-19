@@ -111,6 +111,18 @@ function initUpload() {
 function initGallery() {
     const gallery = $('[data-gallery]');
     if (!gallery) return;
+    const sortDropdown = $('.gallery-sort', gallery);
+    if (sortDropdown) {
+        document.addEventListener('pointerdown', event => {
+            if (sortDropdown.open && !sortDropdown.contains(event.target)) sortDropdown.open = false;
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && sortDropdown.open) {
+                sortDropdown.open = false;
+                $('summary', sortDropdown)?.focus();
+            }
+        });
+    }
     initPagination(gallery);
     const viewer = $('#media-viewer'), mediaHost = $('#viewer-media'), feedback = $('#viewer-hint');
     const media = window.demoMedia || [];
@@ -292,18 +304,18 @@ function initGallery() {
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
-    const status = $('#live-status'), label = $('#live-label');
     const checkFeed = async () => {
         try {
             const response = await fetch(gallery.dataset.feedUrl, { cache: 'no-store', headers: { Accept: 'application/json' } });
             if (!response.ok) throw new Error('Feed unavailable');
             const data = await response.json();
-            status.dataset.status = 'live'; label.textContent = 'LIVE';
             if (!deletion && data.items.map((item) => item.id).join() !== media.map((item) => item.id).join()) window.location.reload();
-        } catch { status.dataset.status = 'reconnecting'; label.textContent = 'RECONNECTING'; }
+        } catch {
+            // Retry on the next polling interval if the feed is unavailable.
+        }
     };
     $('#retry-gallery')?.addEventListener('click', () => { window.location.href = gallery.dataset.feedUrl.replace('/feed', ''); });
-    if (status.dataset.status === 'live') window.setInterval(checkFeed, 20000);
+    if (gallery.dataset.galleryState === 'ready') window.setInterval(checkFeed, 20000);
 }
 
 async function initGuest() {

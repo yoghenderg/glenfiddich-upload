@@ -9,14 +9,13 @@
     @if($state === 'ready' && count($items) > 0 && $items[0]['poster'])<link rel="preload" as="image" href="{{ asset($items[0]['poster']) }}" fetchpriority="high">@endif
 @endpush
 @section('content')
-<section class="gallery-content" data-gallery data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">
+<section class="gallery-content" data-gallery data-gallery-state="{{ $state }}" data-feed-url="{{ route('gallery.feed', ['sort' => $sort]) }}" data-guest-base="{{ url('/media') }}" aria-labelledby="gallery-title">
     <div class="gallery-heading">
         <div class="gallery-heading__title">
             <div class="gallery-heading__copy">
                 <p class="gallery-heading__eyebrow">RAY-BAN MOMENTS</p>
                 <div class="gallery-heading__title-row">
                     <h1 id="gallery-title">Captured moments</h1>
-                    <div id="live-status" class="live-status" data-status="{{ $state === 'ready' ? 'live' : $state }}" role="status" aria-live="polite"><span class="live-status__dot"></span><span id="live-label">{{ $state === 'ready' ? 'LIVE' : strtoupper($state) }}</span></div>
                 </div>
             </div>
         </div>
