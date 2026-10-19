@@ -24,7 +24,7 @@
         </div>
     @endif
         <a class="brand" href="{{ route('upload') }}" aria-label="Ray-Ban, upload home">
-            <img src="{{ asset('media/partner-logo.png') }}" alt="Ray-Ban" width="2048" height="1180">
+        <img src="{{ asset('media/partner-logo.png') }}?v={{ filemtime(public_path('media/partner-logo.png')) }}" alt="Ray-Ban" width="2048" height="1180">
         </a>
         @hasSection('navigation')
             <nav class="site-nav" aria-label="Main navigation">@yield('navigation')
