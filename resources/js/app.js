@@ -18,7 +18,6 @@ function initUpload() {
     const input = $('#media-file'), zone = $('#drop-zone'), feedback = $('#upload-feedback');
     const preview = $('#drop-preview'), previewMedia = $('#preview-media');
     const button = $('#upload-button'), replace = $('#replace-file');
-    const progress = $('#upload-progress'), progressBar = $('#upload-progress-bar');
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/quicktime'];
     let selected = null, objectUrl = null, job = null, controller = null, busy = false;
     const cancel = $('#cancel-upload'), label = $('#upload-button-label'), panel = form.closest('.upload-panel');
@@ -38,16 +37,12 @@ function initUpload() {
             $('#drop-empty').hidden = false;
             replace.hidden = true;
             button.disabled = true;
-            progress.hidden = true;
             feedback.textContent = error;
             feedback.classList.add('is-error');
             return;
         }
         if (objectUrl) URL.revokeObjectURL(objectUrl);
         selected = file;
-        progress.hidden = true;
-        progress.setAttribute('aria-valuenow', '0');
-        progressBar.style.width = '0%';
         objectUrl = URL.createObjectURL(file);
         previewMedia.replaceChildren();
         const media = document.createElement(file.type.startsWith('video/') ? 'video' : 'img');
@@ -80,14 +75,14 @@ function initUpload() {
         event.preventDefault();
         if (!selected || busy) return;
         controller = new AbortController();
-        setBusy(true); progress.hidden = false;
+        setBusy(true);
         feedback.classList.remove('is-error');
         feedback.textContent = 'Preparing your media…';
         label.textContent = 'Uploading…';
         try {
             job ||= new ChunkedUpload(selected, httpTransport(form.dataset.uploadEndpoint));
             const result = await job.run({ signal: controller.signal,
-                onProgress: value => { progressBar.style.width = `${value}%`; progress.setAttribute('aria-valuenow', String(value)); label.textContent = `Uploading ${value}%`; },
+                onProgress: value => { label.textContent = `Uploading ${value}%`; },
                 onStatus: message => { feedback.textContent = message; },
             });
             feedback.textContent = 'Upload complete. View it in the gallery.';

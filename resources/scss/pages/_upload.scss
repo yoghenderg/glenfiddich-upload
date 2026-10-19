@@ -36,8 +36,6 @@
 .upload-panel .upload-submit { border-color: #BC0001; background: #BC0001; color: #fff; box-shadow: 0 7px 22px rgba(188, 0, 1, .16); }
 .upload-panel .upload-submit:hover:not(:disabled) { background: #a60000; }
 .upload-panel .upload-submit:disabled { border-color: #e8dddd; background: #f1eded; color: #716869; box-shadow: none; opacity: 1; }
-.progress { height: 4px; margin-top: 14px; overflow: hidden; border-radius: 99px; background: #eee8e8; }
-.progress__bar { width: 0; height: 100%; border-radius: inherit; background: #BC0001; transition: width .2s; }
 .form-feedback { min-height: 14px; margin-top: 11px; color: #62595a; font-size: .67rem; }
 .form-feedback.is-error { color: #a60000; }
 @media (orientation: landscape) and (max-height: 800px) {

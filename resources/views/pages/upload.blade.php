@@ -18,7 +18,6 @@
             </div>
             <div class="upload-controls"><button type="button" id="replace-file" class="text-button" hidden>Choose a different file</button><button type="button" id="cancel-upload" class="text-button" hidden>Cancel upload</button></div>
             <button id="upload-button" class="button button--dark upload-submit" type="submit" disabled><x-icon name="upload" :size="18"/> <span id="upload-button-label">Upload media</span></button>
-            <div class="progress" id="upload-progress" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden><div class="progress__bar" id="upload-progress-bar"></div></div>
             <p id="upload-feedback" class="form-feedback" role="status" aria-live="polite"></p>
         </form>
     </div>
