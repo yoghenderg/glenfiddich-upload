@@ -106,7 +106,7 @@ button { color: inherit; }
 
 .staff-toolbar {
   position: absolute;
-  top: calc(max(8px, env(safe-area-inset-top)) + 12px);
+  top: calc(max(8px, env(safe-area-inset-top)) + 44px);
   right: 0;
   z-index: 1;
 }
