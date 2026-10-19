@@ -21,6 +21,7 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+    Header always set Permissions-Policy "geolocation=(self), microphone=(self), camera=(self)"
     <FilesMatch "\.(?:css|js|woff2?)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
