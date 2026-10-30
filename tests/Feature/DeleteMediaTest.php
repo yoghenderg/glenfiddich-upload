@@ -39,7 +39,7 @@ class DeleteMediaTest extends TestCase
         Storage::disk('local')->assertExists($media->path);
     }
 
-    public function test_confirmed_deletion_removes_media_and_files_and_cancels_completed_upload(): void
+    public function test_confirmed_deletion_hides_media_preserves_files_and_cancels_completed_upload(): void
     {
         Storage::fake('local');
         $staff = User::factory()->create(['is_staff' => true]);
@@ -58,17 +58,21 @@ class DeleteMediaTest extends TestCase
             ->assertSee('data-card-action="delete"', false)->assertSee('Are you sure?');
         $this->assertDatabaseHas('media', ['id' => $media->id]);
         $this->deleteJson(route('media.destroy', $media))->assertNoContent();
-        $this->assertDatabaseMissing('media', ['id' => $media->id]);
-        Storage::disk('local')->assertMissing($media->path);
-        Storage::disk('local')->assertMissing($media->poster_path);
+        $this->assertSoftDeleted($media);
+        Storage::disk('local')->assertExists($media->path);
+        Storage::disk('local')->assertExists($media->poster_path);
         Storage::disk('local')->assertExists($other->path);
         $this->assertTrue($session->fresh()->cancelled);
-        $this->assertNull($session->fresh()->media_id);
+        $this->assertEquals($media->id, $session->fresh()->media_id);
         $this->postJson('/uploads/'.$session->id.'/complete')->assertGone();
         $this->getJson('/gallery/feed')->assertJsonCount(1, 'items');
         $this->get('/media/'.$media->public_id)->assertNotFound();
         $this->get('/media/'.$media->public_id.'/file')->assertNotFound();
         $this->deleteJson(route('media.destroy', $media))->assertNotFound();
+
+        Media::withTrashed()->findOrFail($media->id)->restore();
+        $this->getJson('/gallery/feed')->assertJsonCount(2, 'items');
+        $this->get('/media/'.$media->public_id.'/file')->assertOk();
     }
 
     public function test_staff_can_delete_video_with_an_already_missing_file(): void
@@ -77,6 +81,6 @@ class DeleteMediaTest extends TestCase
         $staff = User::factory()->create(['is_staff' => true]);
         $media = $this->media($staff, 'video');
         $this->actingAs($staff)->deleteJson(route('media.destroy', $media))->assertNoContent();
-        $this->assertDatabaseMissing('media', ['id' => $media->id]);
+        $this->assertSoftDeleted($media);
     }
 }

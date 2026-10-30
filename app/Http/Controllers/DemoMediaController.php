@@ -127,10 +127,9 @@ final class DemoMediaController extends Controller
     {
         DB::transaction(function () use ($media): void {
             // Keep completed upload keys cancelled so retries cannot recreate deleted media.
-            UploadSession::where('media_id', $media->id)->update(['media_id' => null, 'cancelled' => true]);
+            // Retain the link so abandoned-upload cleanup cannot remove the original.
+            UploadSession::where('media_id', $media->id)->update(['cancelled' => true]);
             $media->delete();
-            $paths = array_values(array_unique(array_filter([$media->path, $media->poster_path, MediaThumbnail::path($media)])));
-            abort_unless(Storage::disk($media->disk)->delete($paths), 500, 'Could not delete the media file.');
         });
 
         return response()->noContent();

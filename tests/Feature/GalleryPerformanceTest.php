@@ -60,7 +60,7 @@ class GalleryPerformanceTest extends TestCase
         $this->withHeader('If-None-Match', $etag)->getJson('/gallery/feed')->assertOk()->assertJsonPath('pagination.total', 0);
     }
 
-    public function test_small_cached_previews_preserve_the_original_and_are_deleted_with_media(): void
+    public function test_small_cached_previews_and_original_survive_media_deletion(): void
     {
         Storage::fake('local');
         $user = User::factory()->create(['is_staff' => true]);
@@ -82,7 +82,9 @@ class GalleryPerformanceTest extends TestCase
         $this->withHeader('If-Modified-Since', $response->headers->get('Last-Modified'))
             ->get(route('media.thumbnail', $media))->assertStatus(304);
         $this->actingAs($user)->deleteJson(route('media.destroy', $media))->assertNoContent();
-        Storage::disk('local')->assertMissing($path);
+        Storage::disk('local')->assertExists($path);
+        Storage::disk('local')->assertExists($media->path);
+        $this->assertSoftDeleted($media);
     }
 
     public function test_filters_paginate_the_filtered_total_and_clamp_after_deletion(): void
